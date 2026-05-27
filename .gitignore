@@ -1,0 +1,59 @@
+# macOS
+.DS_Store
+
+# Flutter / Dart
+app/.dart_tool/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/.packages
+app/.pub-cache/
+app/.pub/
+app/build/
+app/.idea/
+app/.vscode/
+app/*.iml
+app/.metadata
+
+# iOS
+app/ios/Pods/
+app/ios/.symlinks/
+app/ios/Flutter/Flutter.framework
+app/ios/Flutter/Flutter.podspec
+app/ios/Flutter/Generated.xcconfig
+app/ios/Flutter/ephemeral/
+app/ios/Flutter/flutter_export_environment.sh
+app/ios/Flutter/flutter_assets/
+app/ios/Runner/GeneratedPluginRegistrant.*
+app/ios/.generated/
+app/ios/ServiceDefinitions.json
+app/ios/xcuserdata/
+app/ios/**/xcuserdata/
+app/ios/**/DerivedData/
+app/ios/Runner.xcworkspace/xcuserdata/
+
+# Android
+app/android/.gradle/
+app/android/captures/
+app/android/gradlew
+app/android/gradlew.bat
+app/android/local.properties
+app/android/**/GeneratedPluginRegistrant.java
+app/android/key.properties
+app/android/**/*.keystore
+app/android/**/*.jks
+app/android/app/debug
+app/android/app/profile
+app/android/app/release
+
+# Coverage
+app/coverage/
+
+# Secrets — never commit
+**/.env
+**/.env.*
+**/google-services.json
+**/GoogleService-Info.plist
+**/RevenueCat*.plist
+
+# Logs
+*.log
