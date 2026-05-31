@@ -7,7 +7,11 @@ import '../../../core/theme/colors.dart';
 import '../../../core/theme/spacing.dart';
 import '../../../core/theme/typography.dart';
 import '../../../shared/models/quote.dart';
+import '../../categories/presentation/categories_sheet.dart';
 import '../../favorites/providers/favorites_provider.dart';
+import '../../library/providers/history_provider.dart';
+import '../../settings/providers/settings_provider.dart';
+import '../../themes/presentation/customize_quote_sheet.dart';
 import '../providers/quotes_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -26,25 +30,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
+  void _onPageChanged(int i, List<Quote> quotes) {
+    ref.read(currentQuoteIndexProvider.notifier).state = i;
+    if (i < quotes.length) {
+      ref.read(historyProvider.notifier).track(quotes[i].id);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final quotes = ref.watch(filteredQuotesProvider);
     final favs = ref.watch(favoritesProvider);
+    final fontSize = ref.watch(settingsProvider).quoteFontSize;
+
+    if (quotes.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('No quotes for this category')),
+      );
+    }
 
     return Scaffold(
-      backgroundColor: MirraColors.bg,
       body: Stack(
         children: [
           PageView.builder(
             controller: _controller,
             scrollDirection: Axis.vertical,
             itemCount: quotes.length,
-            onPageChanged: (i) =>
-                ref.read(currentQuoteIndexProvider.notifier).state = i,
+            onPageChanged: (i) => _onPageChanged(i, quotes),
             itemBuilder: (context, i) {
               final q = quotes[i];
               return _QuoteCard(
                 quote: q,
+                fontSize: fontSize,
                 isFavorite: favs.contains(q.id),
                 onFavorite: () =>
                     ref.read(favoritesProvider.notifier).toggle(q.id),
@@ -62,26 +79,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 class _QuoteCard extends StatelessWidget {
   const _QuoteCard({
     required this.quote,
+    required this.fontSize,
     required this.isFavorite,
     required this.onFavorite,
   });
 
   final Quote quote;
+  final double fontSize;
   final bool isFavorite;
   final VoidCallback onFavorite;
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? const Color(0xFFF1ECE2) : MirraColors.ink;
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            MirraColors.accentA.withValues(alpha: 0.18),
-            MirraColors.bg,
-            MirraColors.accentB.withValues(alpha: 0.20),
-          ],
+          colors: isDark
+              ? [
+                  const Color(0xFF1A1D2A),
+                  const Color(0xFF0F1119),
+                  const Color(0xFF22202E),
+                ]
+              : [
+                  MirraColors.accentA.withValues(alpha: 0.18),
+                  MirraColors.bg,
+                  MirraColors.accentB.withValues(alpha: 0.20),
+                ],
           stops: const [0.0, 0.55, 1.0],
         ),
       ),
@@ -100,9 +127,9 @@ class _QuoteCard extends StatelessWidget {
               Text(
                 quote.text,
                 style: MirraType.serif(
-                  size: 34,
+                  size: fontSize,
                   height: 1.18,
-                  color: MirraColors.ink,
+                  color: textColor,
                 ),
               ),
               const SizedBox(height: 22),
@@ -121,7 +148,8 @@ class _QuoteCard extends StatelessWidget {
                     icon: isFavorite
                         ? Icons.favorite
                         : Icons.favorite_border_rounded,
-                    iconColor: isFavorite ? MirraColors.danger : MirraColors.ink,
+                    iconColor:
+                        isFavorite ? MirraColors.danger : textColor,
                     onTap: () {
                       HapticFeedback.lightImpact();
                       onFavorite();
@@ -130,13 +158,16 @@ class _QuoteCard extends StatelessWidget {
                   const Spacer(),
                   _CircleAction(
                     icon: Icons.copy_rounded,
+                    iconColor: textColor,
                     onTap: () => Clipboard.setData(
-                      ClipboardData(text: '${quote.text}\n— ${quote.author}'),
+                      ClipboardData(
+                          text: '${quote.text}\n— ${quote.author}'),
                     ),
                   ),
                   const SizedBox(width: 12),
                   _CircleAction(
                     icon: Icons.ios_share_rounded,
+                    iconColor: textColor,
                     onTap: () {},
                   ),
                 ],
@@ -153,7 +184,7 @@ class _CircleAction extends StatelessWidget {
   const _CircleAction({
     required this.icon,
     required this.onTap,
-    this.iconColor = MirraColors.ink,
+    required this.iconColor,
   });
 
   final IconData icon;
@@ -162,6 +193,7 @@ class _CircleAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -169,9 +201,11 @@ class _CircleAction extends StatelessWidget {
         width: 50,
         height: 50,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.7),
+          color: (isDark ? Colors.white : Colors.white)
+              .withValues(alpha: isDark ? 0.1 : 0.7),
           shape: BoxShape.circle,
-          border: Border.all(color: MirraColors.line),
+          border: Border.all(
+              color: isDark ? Colors.white.withValues(alpha: 0.18) : MirraColors.line),
         ),
         child: Icon(icon, color: iconColor, size: 22),
       ),
@@ -185,6 +219,7 @@ class _TopBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final favs = ref.watch(favoritesProvider);
+    final selectedCategory = ref.watch(selectedCategoryProvider);
     return Positioned(
       top: 0,
       left: 0,
@@ -195,17 +230,42 @@ class _TopBar extends ConsumerWidget {
           child: Row(
             children: [
               GestureDetector(
-                onTap: () => Scaffold.of(context).openDrawer(),
-                child: const Icon(Icons.tune_rounded,
-                    color: MirraColors.ink, size: 22),
+                onTap: () => showCategoriesSheet(context),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.7),
+                    borderRadius: BorderRadius.circular(MirraRadius.pill),
+                    border: Border.all(color: MirraColors.line),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.tune_rounded,
+                          size: 14, color: MirraColors.ink),
+                      const SizedBox(width: 6),
+                      Text(
+                        selectedCategory == null
+                            ? 'All'
+                            : QuoteCategory.byId(selectedCategory).label,
+                        style: MirraType.ui(
+                          size: 12,
+                          weight: FontWeight.w600,
+                          color: MirraColors.ink,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
               const Spacer(),
               GestureDetector(
-                onTap: () => context.push('/favorites'),
+                onTap: () => context.push('/library'),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(MirraRadius.pill),
@@ -221,6 +281,7 @@ class _TopBar extends ConsumerWidget {
                         style: MirraType.ui(
                           size: 12,
                           weight: FontWeight.w600,
+                          color: MirraColors.ink,
                         ),
                       ),
                     ],
@@ -264,9 +325,21 @@ class _BottomNav extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _NavIcon(icon: Icons.auto_awesome_rounded, label: 'Mix'),
-              _NavIcon(icon: Icons.palette_outlined, label: 'Theme'),
-              _NavIcon(icon: Icons.person_outline_rounded, label: 'Profile'),
+              _NavIcon(
+                icon: Icons.auto_awesome_rounded,
+                label: 'Mix',
+                onTap: () => showCategoriesSheet(context),
+              ),
+              _NavIcon(
+                icon: Icons.palette_outlined,
+                label: 'Theme',
+                onTap: () => showCustomizeQuoteSheet(context),
+              ),
+              _NavIcon(
+                icon: Icons.person_outline_rounded,
+                label: 'Profile',
+                onTap: () => context.push('/profile'),
+              ),
             ],
           ),
         ),
@@ -276,24 +349,36 @@ class _BottomNav extends StatelessWidget {
 }
 
 class _NavIcon extends StatelessWidget {
-  const _NavIcon({required this.icon, required this.label});
+  const _NavIcon({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
   final IconData icon;
   final String label;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(icon, color: MirraColors.ink, size: 22),
-        const SizedBox(height: 2),
-        Text(label,
-            style: MirraType.ui(
-              size: 10,
-              color: MirraColors.muted,
-              weight: FontWeight.w500,
-            )),
-      ],
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 6),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: MirraColors.ink, size: 22),
+            const SizedBox(height: 2),
+            Text(label,
+                style: MirraType.ui(
+                  size: 10,
+                  color: MirraColors.muted,
+                  weight: FontWeight.w500,
+                )),
+          ],
+        ),
+      ),
     );
   }
 }

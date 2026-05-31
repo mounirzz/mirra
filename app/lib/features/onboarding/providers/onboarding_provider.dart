@@ -20,6 +20,9 @@ class OnboardingNotifier extends StateNotifier<Map<String, String>> {
         streak: p.streak == 0 ? 1 : p.streak,
         iconChoice: p.iconChoice,
         themeChoice: p.themeChoice,
+        themeMode: p.themeMode,
+        language: p.language,
+        quoteFontSize: p.quoteFontSize,
       ),
     );
   }

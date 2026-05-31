@@ -31,4 +31,30 @@ class MirraTheme {
       ),
     );
   }
+
+  static ThemeData dark() {
+    final base = ThemeData.dark(useMaterial3: true);
+    return base.copyWith(
+      scaffoldBackgroundColor: const Color(0xFF0F1119),
+      colorScheme: const ColorScheme.dark(
+        primary: Colors.white,
+        onPrimary: MirraColors.ink,
+        secondary: MirraColors.accentA,
+        surface: Color(0xFF1A1D2A),
+        onSurface: Color(0xFFF1ECE2),
+        error: MirraColors.danger,
+      ),
+      textTheme: GoogleFonts.interTextTheme(base.textTheme).apply(
+        bodyColor: const Color(0xFFF1ECE2),
+        displayColor: const Color(0xFFF1ECE2),
+      ),
+      splashFactory: InkRipple.splashFactory,
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+        },
+      ),
+    );
+  }
 }
