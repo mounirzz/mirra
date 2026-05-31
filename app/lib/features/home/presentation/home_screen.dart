@@ -264,9 +264,13 @@ class _BottomNav extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _NavIcon(icon: Icons.auto_awesome_rounded, label: 'Mix'),
-              _NavIcon(icon: Icons.palette_outlined, label: 'Theme'),
-              _NavIcon(icon: Icons.person_outline_rounded, label: 'Profile'),
+              const _NavIcon(icon: Icons.auto_awesome_rounded, label: 'Mix'),
+              const _NavIcon(icon: Icons.palette_outlined, label: 'Theme'),
+              _NavIcon(
+                icon: Icons.person_outline_rounded,
+                label: 'Profile',
+                onTap: () => context.push('/profile'),
+              ),
             ],
           ),
         ),
@@ -276,24 +280,29 @@ class _BottomNav extends StatelessWidget {
 }
 
 class _NavIcon extends StatelessWidget {
-  const _NavIcon({required this.icon, required this.label});
+  const _NavIcon({required this.icon, required this.label, this.onTap});
   final IconData icon;
   final String label;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(icon, color: MirraColors.ink, size: 22),
-        const SizedBox(height: 2),
-        Text(label,
-            style: MirraType.ui(
-              size: 10,
-              color: MirraColors.muted,
-              weight: FontWeight.w500,
-            )),
-      ],
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: MirraColors.ink, size: 22),
+          const SizedBox(height: 2),
+          Text(label,
+              style: MirraType.ui(
+                size: 10,
+                color: MirraColors.muted,
+                weight: FontWeight.w500,
+              )),
+        ],
+      ),
     );
   }
 }

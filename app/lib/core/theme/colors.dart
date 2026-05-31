@@ -11,6 +11,8 @@ class MirraColors {
   static const muted2 = Color(0xFF9AA0AE);
   static const chip = Color(0xFFECE9F5);
   static const chipLine = Color(0xFFDDD8EC);
+  // Lavender surface used by profile/settings tiles & rows (prototype #E9E6F2).
+  static const tile = Color(0xFFE9E6F2);
   static const line = Color(0xFFECE7DE);
   static const line2 = Color(0xFFE5DFD3);
   static const accentA = Color(0xFFB79DE8);
