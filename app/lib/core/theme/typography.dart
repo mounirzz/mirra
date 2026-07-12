@@ -51,6 +51,41 @@ class MirraType {
     );
   }
 
+  static TextStyle carmenSans({
+    double size = 16,
+    Color color = MirraColors.ink,
+    double? height,
+    double? letterSpacing,
+  }) {
+    return TextStyle(
+      fontFamily: 'CarmenSans',
+      fontSize: size,
+      color: color,
+      fontWeight: FontWeight.w800,
+      height: height,
+      letterSpacing: letterSpacing,
+    );
+  }
+
+  static TextStyle cochin({
+    double size = 15,
+    Color color = MirraColors.ink,
+    FontWeight weight = FontWeight.w400,
+    FontStyle style = FontStyle.normal,
+    double? height,
+    double? letterSpacing,
+  }) {
+    return TextStyle(
+      fontFamily: 'Cochin',
+      fontSize: size,
+      color: color,
+      fontWeight: weight,
+      fontStyle: style,
+      height: height,
+      letterSpacing: letterSpacing,
+    );
+  }
+
   static TextStyle hero = serif(size: 44, height: 1.05);
   static TextStyle title = serif(size: 32, height: 1.1);
   static TextStyle quoteCard = serif(size: 30, height: 1.18);
@@ -61,7 +96,9 @@ class MirraType {
     weight: FontWeight.w500,
     letterSpacing: 0.4,
   );
-  static TextStyle eyebrow = mono(size: 11, weight: FontWeight.w500).copyWith(
+  static TextStyle eyebrow = cochin(
+    size: 11,
+    weight: FontWeight.w500,
     letterSpacing: 1.4,
   );
 }

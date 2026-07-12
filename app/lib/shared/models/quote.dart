@@ -24,6 +24,7 @@ class QuoteCategory {
   static const sports = QuoteCategory._('sports', 'Sports');
   static const happiness = QuoteCategory._('happiness', 'Happiness');
   static const faith = QuoteCategory._('faith', 'Faith & spirituality');
+  static const personal = QuoteCategory._('personal', 'My affirmations');
 
   static const all = <QuoteCategory>[
     motivation,
@@ -44,6 +45,7 @@ class QuoteCategory {
     sports,
     happiness,
     faith,
+    personal,
   ];
 
   static QuoteCategory byId(String id) =>

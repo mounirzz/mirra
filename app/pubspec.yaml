@@ -18,6 +18,13 @@ dependencies:
   hive_flutter: ^1.1.0
   path_provider: ^2.1.5
   shared_preferences: ^2.3.4
+  share_plus: ^10.1.4
+  image_picker: ^1.1.2
+  flutter_local_notifications: ^19.4.2
+  flutter_timezone: ^4.1.1
+  timezone: ^0.10.1
+  screenshot: ^3.0.0
+  in_app_purchase: ^3.2.0
 
 dev_dependencies:
   flutter_test:
@@ -26,3 +33,12 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/photos/
+
+  fonts:
+    - family: CarmenSans
+      fonts:
+        - asset: assets/fonts/CarmenSans-ExtraBold.ttf
+          weight: 800

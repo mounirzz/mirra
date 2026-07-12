@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/colors.dart';
+import '../../core/theme/palette_provider.dart';
 import '../../core/theme/spacing.dart';
 import '../../core/theme/typography.dart';
 
-class PrimaryButton extends StatelessWidget {
+class PrimaryButton extends ConsumerWidget {
   const PrimaryButton({
     super.key,
     required this.label,
@@ -19,24 +21,23 @@ class PrimaryButton extends StatelessWidget {
   final bool fullWidth;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final palette = ref.watch(themePaletteProvider).paletteOrFallback;
     final isEnabled = onPressed != null;
     final child = Container(
       height: 56,
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 28),
       decoration: BoxDecoration(
-        color: gradient ? null : (isEnabled ? MirraColors.ink : MirraColors.muted2),
-        gradient: gradient ? MirraColors.grad : null,
+        color: gradient
+            ? null
+            : (isEnabled ? MirraColors.ink : MirraColors.muted2),
+        gradient: gradient ? palette.grad : null,
         borderRadius: BorderRadius.circular(MirraRadius.pill),
       ),
       child: Text(
         label,
-        style: MirraType.ui(
-          size: 16,
-          color: Colors.white,
-          weight: FontWeight.w600,
-        ),
+        style: MirraType.carmenSans(size: 16, color: Colors.white),
       ),
     );
 
@@ -45,7 +46,9 @@ class PrimaryButton extends StatelessWidget {
       child: GestureDetector(
         onTap: onPressed,
         behavior: HitTestBehavior.opaque,
-        child: fullWidth ? SizedBox(width: double.infinity, child: child) : child,
+        child: fullWidth
+            ? SizedBox(width: double.infinity, child: child)
+            : child,
       ),
     );
   }
@@ -69,10 +72,7 @@ class GhostButton extends StatelessWidget {
           border: Border.all(color: MirraColors.chipLine),
           borderRadius: BorderRadius.circular(MirraRadius.pill),
         ),
-        child: Text(
-          label,
-          style: MirraType.ui(size: 15, weight: FontWeight.w500),
-        ),
+        child: Text(label, style: MirraType.carmenSans(size: 15)),
       ),
     );
   }

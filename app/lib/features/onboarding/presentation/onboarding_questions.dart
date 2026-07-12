@@ -4,12 +4,23 @@ class OnbQuestion {
     required this.title,
     required this.options,
     this.subtitle,
+    this.maxSelections = 1,
+    this.allowCustom = false,
   });
 
   final String id;
   final String title;
   final String? subtitle;
   final List<String> options;
+
+  /// How many options can be picked at once (1 = single choice).
+  final int maxSelections;
+
+  /// Whether the user can write their own answer in addition to the
+  /// predefined options.
+  final bool allowCustom;
+
+  bool get isMulti => maxSelections > 1;
 }
 
 const List<OnbQuestion> kOnboardingQuestions = [
@@ -22,7 +33,13 @@ const List<OnbQuestion> kOnboardingQuestions = [
   OnbQuestion(
     id: 'age',
     title: 'How old are you?',
-    options: ['13 \u2013 17', '18 \u2013 24', '25 \u2013 34', '35 \u2013 44', '45 +'],
+    options: [
+      '13 \u2013 17',
+      '18 \u2013 24',
+      '25 \u2013 34',
+      '35 \u2013 44',
+      '45 +',
+    ],
   ),
   OnbQuestion(
     id: 'mood',
@@ -32,11 +49,17 @@ const List<OnbQuestion> kOnboardingQuestions = [
   OnbQuestion(
     id: 'feeling_source',
     title: 'What\u2019s shaping how you feel today?',
-    options: ['Work', 'Relationships', 'Self-image', 'Health', 'Money', 'Other'],
+    subtitle: 'Choose up to 3.',
+    maxSelections: 3,
+    allowCustom: true,
+    options: ['Work', 'Relationships', 'Self-image', 'Health', 'Money'],
   ),
   OnbQuestion(
     id: 'improve',
-    title: 'What do you want to improve first?',
+    title: 'What do you want to improve?',
+    subtitle: 'Choose up to 3.',
+    maxSelections: 3,
+    allowCustom: true,
     options: ['Confidence', 'Focus', 'Calm', 'Discipline'],
   ),
   OnbQuestion(
@@ -47,21 +70,10 @@ const List<OnbQuestion> kOnboardingQuestions = [
   OnbQuestion(
     id: 'motivation_source',
     title: 'Where do you find motivation?',
+    subtitle: 'Choose up to 3.',
+    maxSelections: 3,
+    allowCustom: true,
     options: ['Books', 'People', 'Music', 'Solitude', 'Movement'],
-  ),
-  OnbQuestion(
-    id: 'vision',
-    title: 'How clear is your vision for the next year?',
-    options: ['Foggy', 'Forming', 'Clear', 'Crystal'],
-  ),
-  OnbQuestion(
-    id: 'zodiac',
-    title: 'What\u2019s your zodiac sign?',
-    options: [
-      'Aries', 'Taurus', 'Gemini', 'Cancer',
-      'Leo', 'Virgo', 'Libra', 'Scorpio',
-      'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces',
-    ],
   ),
   OnbQuestion(
     id: 'time',
@@ -72,10 +84,5 @@ const List<OnbQuestion> kOnboardingQuestions = [
     id: 'frequency',
     title: 'How often do you want reminders?',
     options: ['Once a day', '3 times', '11 times'],
-  ),
-  OnbQuestion(
-    id: 'commitment',
-    title: 'How long do you want to commit?',
-    options: ['7 days', '30 days', '90 days', 'Lifetime'],
   ),
 ];

@@ -47,9 +47,8 @@ class ChipOption extends StatelessWidget {
             ],
             Text(
               label,
-              style: MirraType.ui(
+              style: MirraType.carmenSans(
                 size: 14,
-                weight: FontWeight.w500,
                 color: selected ? Colors.white : MirraColors.ink,
               ),
             ),

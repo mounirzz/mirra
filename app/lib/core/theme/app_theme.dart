@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -18,10 +19,9 @@ class MirraTheme {
         onSurface: MirraColors.ink,
         error: MirraColors.danger,
       ),
-      textTheme: GoogleFonts.interTextTheme(base.textTheme).apply(
-        bodyColor: MirraColors.ink,
-        displayColor: MirraColors.ink,
-      ),
+      textTheme: GoogleFonts.interTextTheme(
+        base.textTheme,
+      ).apply(bodyColor: MirraColors.ink, displayColor: MirraColors.ink),
       splashFactory: InkRipple.splashFactory,
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
