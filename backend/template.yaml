@@ -1,0 +1,209 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Mirra backend — Cognito auth (Apple + Google), presigned S3 uploads for
+  user theme images, and per-user theme storage in DynamoDB.
+
+Parameters:
+  BucketName:
+    Type: String
+    Default: mirra-affirmation-bucket
+    Description: Existing S3 bucket that stores theme images.
+  AppleServicesId:
+    Type: String
+    Description: Apple "Services ID" (client_id) for Sign in with Apple.
+  AppleTeamId:
+    Type: String
+  AppleKeyId:
+    Type: String
+  ApplePrivateKey:
+    Type: String
+    NoEcho: true
+    Description: Contents of the Sign in with Apple .p8 private key.
+  GoogleClientId:
+    Type: String
+  GoogleClientSecret:
+    Type: String
+    NoEcho: true
+  CallbackUrl:
+    Type: String
+    Default: mirra://auth
+    Description: App deep-link the Cognito Hosted UI redirects back to.
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Timeout: 10
+    MemorySize: 256
+    Architectures: [arm64]
+    Environment:
+      Variables:
+        BUCKET: !Ref BucketName
+        THEMES_TABLE: !Ref ThemesTable
+
+Resources:
+  # ─── Auth: Cognito User Pool + federated Apple/Google ─────────────────────
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: mirra-users
+      UsernameAttributes: [email]
+      AutoVerifiedAttributes: [email]
+      Schema:
+        - Name: email
+          Required: true
+          Mutable: true
+
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Sub "mirra-auth-${AWS::AccountId}"
+      UserPoolId: !Ref UserPool
+
+  AppleIdP:
+    Type: AWS::Cognito::UserPoolIdentityProvider
+    Properties:
+      UserPoolId: !Ref UserPool
+      ProviderName: SignInWithApple
+      ProviderType: SignInWithApple
+      AttributeMapping:
+        email: email
+      ProviderDetails:
+        client_id: !Ref AppleServicesId
+        team_id: !Ref AppleTeamId
+        key_id: !Ref AppleKeyId
+        private_key: !Ref ApplePrivateKey
+        authorize_scopes: "email name"
+
+  GoogleIdP:
+    Type: AWS::Cognito::UserPoolIdentityProvider
+    Properties:
+      UserPoolId: !Ref UserPool
+      ProviderName: Google
+      ProviderType: Google
+      AttributeMapping:
+        email: email
+      ProviderDetails:
+        client_id: !Ref GoogleClientId
+        client_secret: !Ref GoogleClientSecret
+        authorize_scopes: "openid email profile"
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    DependsOn: [AppleIdP, GoogleIdP]
+    Properties:
+      UserPoolId: !Ref UserPool
+      ClientName: mirra-app
+      GenerateSecret: false
+      SupportedIdentityProviders: [SignInWithApple, Google]
+      AllowedOAuthFlows: [code]
+      AllowedOAuthScopes: [openid, email, profile]
+      AllowedOAuthFlowsUserPoolClient: true
+      CallbackURLs: [!Ref CallbackUrl]
+      LogoutURLs: [!Ref CallbackUrl]
+
+  # ─── Storage: per-user theme records ──────────────────────────────────────
+  ThemesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: mirra-user-themes
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: themeId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: themeId
+          KeyType: RANGE
+
+  # ─── API: HTTP API protected by the Cognito JWT authorizer ────────────────
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        DefaultAuthorizer: CognitoJwt
+        Authorizers:
+          CognitoJwt:
+            IdentitySource: "$request.header.Authorization"
+            JwtConfiguration:
+              issuer: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}"
+              audience:
+                - !Ref UserPoolClient
+      CorsConfiguration:
+        AllowMethods: [GET, POST, DELETE, OPTIONS]
+        AllowHeaders: [authorization, content-type]
+        AllowOrigins: ["*"]
+
+  # ─── Lambdas ───────────────────────────────────────────────────────────────
+  UploadUrlFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: uploadUrl.handler
+      CodeUri: src/
+      Policies:
+        - S3CrudPolicy: { BucketName: !Ref BucketName }
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Method: POST
+            Path: /themes/upload-url
+
+  SaveThemeFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: saveTheme.handler
+      CodeUri: src/
+      Policies:
+        - DynamoDBCrudPolicy: { TableName: !Ref ThemesTable }
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Method: POST
+            Path: /themes
+
+  GetThemesFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: getThemes.handler
+      CodeUri: src/
+      Policies:
+        - DynamoDBReadPolicy: { TableName: !Ref ThemesTable }
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Method: GET
+            Path: /themes
+
+  DeleteThemeFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: deleteTheme.handler
+      CodeUri: src/
+      Policies:
+        - DynamoDBCrudPolicy: { TableName: !Ref ThemesTable }
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Method: DELETE
+            Path: /themes/{themeId}
+
+Outputs:
+  ApiBaseUrl:
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+  UserPoolId:
+    Value: !Ref UserPool
+  UserPoolClientId:
+    Value: !Ref UserPoolClient
+  HostedUiDomain:
+    Value: !Sub "https://mirra-auth-${AWS::AccountId}.auth.${AWS::Region}.amazoncognito.com"
