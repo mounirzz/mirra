@@ -1,252 +1,214 @@
+// Themes screen — matches the Mirra design: tabs, Theme mixes carousel,
+// and a "For you" grid of theme tiles (each previews its background + "Aa" in
+// the theme's own font). Selecting a tile applies the theme to the feed.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/colors.dart';
-import '../../../core/theme/palette.dart';
-import '../../../core/theme/palette_provider.dart';
-import '../../../core/theme/spacing.dart';
-import '../../../core/theme/theme_selection.dart';
 import '../../../core/theme/typography.dart';
-import '../../../shared/widgets/app_background.dart';
-import '../../../shared/widgets/ios_status_bar.dart';
-import '../../../shared/widgets/tap_icon.dart';
-import '../../premium/providers/premium_provider.dart';
+import '../app_theme_provider.dart';
+import '../theme_catalog.dart';
+import 'theme_mix_card.dart';
+import 'theme_tile.dart';
 
-class ThemeScreen extends ConsumerWidget {
+class ThemeScreen extends ConsumerStatefulWidget {
   const ThemeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final current = ref.watch(themePaletteProvider);
-    final notifier = ref.read(themePaletteProvider.notifier);
-    final isPremium = ref.watch(isPremiumProvider);
-
-    Widget sectionTitle(String label) => Padding(
-      padding: const EdgeInsets.only(bottom: MirraSpace.sm),
-      child: Text(
-        label,
-        style: MirraType.cochin(size: 15, weight: FontWeight.w700),
-      ),
-    );
-
-    Widget grid(List<Widget> tiles) => GridView.count(
-      crossAxisCount: 3,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: MirraSpace.sm,
-      crossAxisSpacing: MirraSpace.sm,
-      childAspectRatio: 0.78,
-      children: tiles,
-    );
-
-    return Scaffold(
-      body: AppBackground(
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const IosStatusSpacer(height: 12),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: MirraSpace.lg),
-                child: Row(
-                  children: [
-                    MirraBackButton(onTap: () => context.pop()),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Theme',
-                      style: MirraType.cochin(
-                        size: 26,
-                        weight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: MirraSpace.md),
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(
-                    MirraSpace.lg,
-                    0,
-                    MirraSpace.lg,
-                    40,
-                  ),
-                  children: [
-                    sectionTitle('Your photo'),
-                    grid([
-                      _ThemeTile(
-                        label: current.kind == ThemeKind.customPhoto
-                            ? 'Change'
-                            : 'Import',
-                        selected: current.kind == ThemeKind.customPhoto,
-                        // Camera-roll backgrounds are a Mirra+ perk.
-                        locked: !isPremium,
-                        onTap: () {
-                          if (!isPremium) {
-                            context.push('/paywall');
-                          } else {
-                            notifier.pickCustomPhoto();
-                          }
-                        },
-                        preview: current.kind == ThemeKind.customPhoto
-                            ? Image(
-                                image: current.imageProvider!,
-                                fit: BoxFit.cover,
-                              )
-                            : const ColoredBox(
-                                color: MirraColors.chip,
-                                child: Icon(
-                                  Icons.add_photo_alternate_outlined,
-                                  color: MirraColors.ink,
-                                  size: 28,
-                                ),
-                              ),
-                      ),
-                    ]),
-                    const SizedBox(height: MirraSpace.lg),
-                    sectionTitle('Colors'),
-                    grid([
-                      for (final palette in MirraPalette.all)
-                        _ThemeTile(
-                          label: palette.label,
-                          selected:
-                              current.kind == ThemeKind.color &&
-                              current.palette?.id == palette.id,
-                          onTap: () => notifier.selectPalette(palette),
-                          preview: DecoratedBox(
-                            decoration: BoxDecoration(gradient: palette.grad),
-                          ),
-                        ),
-                    ]),
-                    const SizedBox(height: MirraSpace.lg),
-                    sectionTitle('Photos'),
-                    grid([
-                      for (final photo in ThemePhoto.all)
-                        _ThemeTile(
-                          label: photo.label,
-                          selected:
-                              current.kind == ThemeKind.presetPhoto &&
-                              current.presetPhoto?.id == photo.id,
-                          locked: photo.premium && !isPremium,
-                          onTap: () {
-                            if (photo.premium && !isPremium) {
-                              context.push('/paywall');
-                            } else {
-                              notifier.selectPresetPhoto(photo);
-                            }
-                          },
-                          preview: Image.asset(photo.asset, fit: BoxFit.cover),
-                        ),
-                    ]),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  ConsumerState<ThemeScreen> createState() => _ThemeScreenState();
 }
 
-/// Square visual preview + name, with an ink border and a check badge when
-/// selected — the whole catalog is scannable at a glance.
-class _ThemeTile extends StatelessWidget {
-  const _ThemeTile({
-    required this.preview,
-    required this.label,
-    required this.selected,
-    required this.onTap,
-    this.locked = false,
-  });
+class _ThemeScreenState extends ConsumerState<ThemeScreen> {
+  static const _tabs = ['+ Create', 'All', 'New', 'Seasonal', 'Most popular', 'Recent'];
+  String _tab = 'All';
 
-  final Widget preview;
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  /// Mirra+ theme shown with a lock badge; tapping opens the paywall.
-  final bool locked;
+  List<AppTheme> get _filtered {
+    switch (_tab) {
+      case 'New':
+        return kAppThemes.where((t) => t.tags.contains('new')).toList();
+      case 'Seasonal':
+        return kAppThemes.where((t) => t.tags.contains('seasonal')).toList();
+      case 'Most popular':
+        return kAppThemes.where((t) => t.tags.contains('popular')).toList();
+      default:
+        return kAppThemes;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(MirraRadius.md),
-                border: Border.all(
-                  color: selected ? MirraColors.ink : MirraColors.line,
-                  width: selected ? 2.5 : 1,
-                ),
+    final selected = ref.watch(appThemeProvider);
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => context.pop(),
+                    behavior: HitTestBehavior.opaque,
+                    child: const SizedBox(
+                      width: 32,
+                      height: 32,
+                      child: Icon(Icons.close_rounded,
+                          size: 22, color: MirraColors.ink),
+                    ),
+                  ),
+                ],
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(MirraRadius.md - 2),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    preview,
-                    if (locked)
-                      Container(
-                        color: Colors.black.withValues(alpha: 0.25),
-                        alignment: Alignment.center,
-                        child: const DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.all(6),
-                            child: Icon(
-                              Icons.lock_rounded,
-                              color: MirraColors.ink,
-                              size: 16,
-                            ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
+              child: Text(
+                'Themes',
+                style: MirraType.cochin(size: 24, weight: FontWeight.w800),
+              ),
+            ),
+            // Tabs
+            SizedBox(
+              height: 34,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                itemCount: _tabs.length,
+                separatorBuilder: (_, _) => const SizedBox(width: 6),
+                itemBuilder: (_, i) {
+                  final t = _tabs[i];
+                  final on = t == _tab;
+                  return GestureDetector(
+                    onTap: () {
+                      if (t == '+ Create') {
+                        context.push('/theme/create');
+                      } else {
+                        setState(() => _tab = t);
+                      }
+                    },
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      decoration: BoxDecoration(
+                        color: on ? MirraColors.ink : const Color(0xFFE9E6F2),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        t,
+                        style: MirraType.cochin(
+                          size: 13,
+                          weight: FontWeight.w500,
+                          color: on ? Colors.white : MirraColors.ink,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Theme mixes',
+                        style:
+                            MirraType.cochin(size: 17, weight: FontWeight.w800),
+                      ),
+                      GestureDetector(
+                        onTap: () => context.push('/theme/mixes'),
+                        behavior: HitTestBehavior.opaque,
+                        child: Text(
+                          'See all',
+                          style: MirraType.cochin(
+                            size: 13,
+                            weight: FontWeight.w500,
+                            color: MirraColors.ink,
                           ),
                         ),
                       ),
-                    if (selected)
-                      const Align(
-                        alignment: Alignment.topRight,
-                        child: Padding(
-                          padding: EdgeInsets.all(6),
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.check_circle_rounded,
-                              color: MirraColors.ink,
-                              size: 20,
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    height: 76,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ThemeMixCard(
+                            mix: kThemeMixes[2],
+                            onTap: () => context.push('/theme/mixes'),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => context.push('/theme/mixes'),
+                            behavior: HitTestBehavior.opaque,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFD7DBE8),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                '+ ${kThemeMixes.length - 1}',
+                                style: MirraType.cochin(
+                                  size: 18,
+                                  weight: FontWeight.w600,
+                                  color: MirraColors.ink,
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                  ],
-                ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 22),
+                  Text(
+                    'For you',
+                    style: MirraType.cochin(size: 17, weight: FontWeight.w800),
+                  ),
+                  const SizedBox(height: 12),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      childAspectRatio: 0.72,
+                    ),
+                    itemCount: _filtered.length,
+                    itemBuilder: (_, i) {
+                      final t = _filtered[i];
+                      return ThemeTile(
+                        theme: t,
+                        selected: selected.id == t.id,
+                        onTap: () {
+                          ref.read(appThemeProvider.notifier).select(t);
+                          context.pop();
+                        },
+                        onEdit: () => context.push('/theme/create'),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: MirraType.cochin(
-              size: 12,
-              weight: FontWeight.w700,
-              color: selected ? MirraColors.ink : MirraColors.muted,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -16,13 +16,18 @@ import '../../../core/theme/typography.dart';
 import '../../../shared/models/quote.dart';
 import '../../../shared/widgets/app_background.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../../../shared/widgets/glass.dart';
 import '../../../shared/widgets/tap_icon.dart';
 import '../../favorites/providers/favorites_provider.dart';
 import '../../premium/providers/premium_provider.dart';
 import '../../premium/upsell_sheet.dart';
 import '../../share/share_card.dart';
 import '../../streak/providers/streak_provider.dart';
+import '../../theme/app_theme_provider.dart';
+import '../../theme/theme_catalog.dart';
 import '../providers/quotes_provider.dart';
+import 'nav_asset_icon.dart';
+import 'nav_glyphs.dart';
 import 'quote_boosts.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -404,33 +409,14 @@ class _QuoteCardState extends ConsumerState<_QuoteCard>
 
   @override
   Widget build(BuildContext context) {
-    final selection = ref.watch(themePaletteProvider);
-    final palette = selection.paletteOrFallback;
+    final theme = ref.watch(appThemeProvider);
+    final onDark = theme.dark || theme.isPhoto || theme.custom;
+    // Glass-control foreground: white on dark backgrounds, ink on light ones.
+    final navFg = theme.dark ? Colors.white : MirraColors.ink;
+    final quoteText =
+        theme.caps ? quote.text.toUpperCase() : quote.text;
     return Container(
-      decoration: BoxDecoration(
-        image: selection.isPhoto
-            ? DecorationImage(
-                image: selection.imageProvider!,
-                fit: BoxFit.cover,
-                colorFilter: ColorFilter.mode(
-                  Colors.black.withValues(alpha: 0.28),
-                  BlendMode.darken,
-                ),
-              )
-            : null,
-        gradient: selection.isPhoto
-            ? null
-            : LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  palette.accentA.withValues(alpha: 0.18),
-                  MirraColors.bg,
-                  palette.accentB.withValues(alpha: 0.20),
-                ],
-                stops: const [0.0, 0.55, 1.0],
-              ),
-      ),
+      decoration: _themeBackground(theme),
       child: GestureDetector(
         onDoubleTap: _onDoubleTap,
         behavior: HitTestBehavior.opaque,
@@ -448,24 +434,24 @@ class _QuoteCardState extends ConsumerState<_QuoteCard>
                     Text(
                       quote.category.label.toUpperCase(),
                       style: MirraType.eyebrow.copyWith(
-                        color: MirraColors.muted,
+                        color: onDark
+                            ? Colors.white.withValues(alpha: 0.75)
+                            : MirraColors.muted,
                       ),
                     ),
                     const SizedBox(height: 22),
                     Text(
-                      quote.text,
-                      style: MirraType.serif(
-                        size: 34,
-                        height: 1.18,
-                        color: MirraColors.ink,
-                      ),
+                      quoteText,
+                      style: theme.quoteStyle(34).copyWith(height: 1.18),
                     ),
                     const SizedBox(height: 22),
                     Text(
                       boostFor(quote),
                       style: MirraType.cochin(
                         size: 17,
-                        color: MirraColors.ink2,
+                        color: onDark
+                            ? Colors.white.withValues(alpha: 0.85)
+                            : MirraColors.ink2,
                         weight: FontWeight.w700,
                         style: FontStyle.italic,
                         height: 1.3,
@@ -475,8 +461,8 @@ class _QuoteCardState extends ConsumerState<_QuoteCard>
                 ),
               ),
             ),
-            // TikTok-style action rail: like / copy / share stacked on the
-            // right edge, vertically centered like TikTok's.
+            // Action rail: like / copy / share as three separate glass buttons
+            // stacked on the right edge, vertically centered.
             Positioned.fill(
               child: Align(
                 alignment: Alignment.centerRight,
@@ -491,7 +477,7 @@ class _QuoteCardState extends ConsumerState<_QuoteCard>
                             : Icons.favorite_border_rounded,
                         iconColor: isFavorite
                             ? MirraColors.danger
-                            : MirraColors.ink,
+                            : navFg,
                         semanticLabel: isFavorite
                             ? 'Remove from favorites'
                             : 'Add to favorites',
@@ -500,19 +486,19 @@ class _QuoteCardState extends ConsumerState<_QuoteCard>
                           widget.onFavorite();
                         },
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 12),
                       _CircleAction(
                         icon: Icons.copy_rounded,
+                        iconColor: navFg,
                         semanticLabel: 'Copy quote',
                         onTap: () => _copyQuote(context),
                       ),
-                      const SizedBox(height: 14),
-                      Builder(
-                        builder: (context) => _CircleAction(
-                          icon: Icons.ios_share_rounded,
-                          semanticLabel: 'Share quote',
-                          onTap: () => _shareQuote(context),
-                        ),
+                      const SizedBox(height: 12),
+                      _CircleAction(
+                        icon: Icons.ios_share_rounded,
+                        iconColor: navFg,
+                        semanticLabel: 'Share quote',
+                        onTap: () => _shareQuote(context),
                       ),
                     ],
                   ),
@@ -557,6 +543,37 @@ class _QuoteCardState extends ConsumerState<_QuoteCard>
   }
 }
 
+/// Builds the feed background for the active theme: a custom photo file, a
+/// network photo, a gradient, or a flat colour. Photos get a soft dark scrim
+/// so light text and the glass controls stay legible.
+BoxDecoration _themeBackground(AppTheme theme) {
+  final customFile = theme.custom ? activeCustomPhotoFile() : null;
+  final ImageProvider? image =
+      customFile != null ? FileImage(customFile) : theme.bgImage;
+  if (image != null) {
+    return BoxDecoration(
+      image: DecorationImage(
+        image: image,
+        fit: BoxFit.cover,
+        colorFilter: ColorFilter.mode(
+          Colors.black.withValues(alpha: 0.28),
+          BlendMode.darken,
+        ),
+      ),
+    );
+  }
+  if (theme.gradient != null) {
+    return BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: theme.gradient!,
+      ),
+    );
+  }
+  return BoxDecoration(color: theme.solid ?? MirraColors.bg);
+}
+
 class _CircleAction extends StatelessWidget {
   const _CircleAction({
     required this.icon,
@@ -578,15 +595,11 @@ class _CircleAction extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
-        child: Container(
+        child: Glass(
+          radius: 999,
           width: 50,
           height: 50,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.7),
-            shape: BoxShape.circle,
-            border: Border.all(color: MirraColors.line),
-          ),
-          child: Icon(icon, color: iconColor, size: 22),
+          child: Center(child: Icon(icon, color: iconColor, size: 22)),
         ),
       ),
     );
@@ -599,6 +612,8 @@ class _TopBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final favs = ref.watch(favoritesProvider);
+    final theme = ref.watch(appThemeProvider);
+    final fg = theme.dark ? Colors.white : MirraColors.ink;
     return Positioned(
       top: 0,
       left: 0,
@@ -610,11 +625,13 @@ class _TopBar extends ConsumerWidget {
             children: [
               TapIcon(
                 icon: Icons.tune_rounded,
+                color: fg,
                 semanticLabel: 'Reminder preferences',
                 onTap: () => context.push('/preferences'),
               ),
               TapIcon(
                 icon: Icons.add_circle_outline_rounded,
+                color: fg,
                 semanticLabel: 'My affirmations',
                 onTap: () => context.push('/my-quotes'),
               ),
@@ -624,22 +641,18 @@ class _TopBar extends ConsumerWidget {
               GestureDetector(
                 onTap: () => context.push('/favorites'),
                 behavior: HitTestBehavior.opaque,
-                child: Container(
+                child: Glass(
+                  radius: MirraRadius.pill,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,
                     vertical: 8,
                   ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.7),
-                    borderRadius: BorderRadius.circular(MirraRadius.pill),
-                    border: Border.all(color: MirraColors.line),
-                  ),
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.favorite_border_rounded,
                         size: 16,
-                        color: MirraColors.ink,
+                        color: fg,
                       ),
                       const SizedBox(width: 6),
                       Text(
@@ -649,6 +662,7 @@ class _TopBar extends ConsumerWidget {
                         style: MirraType.cochin(
                           size: 12,
                           weight: FontWeight.w700,
+                          color: fg,
                         ),
                       ),
                     ],
@@ -688,17 +702,15 @@ class _StreakBadgeState extends ConsumerState<_StreakBadge>
   @override
   Widget build(BuildContext context) {
     final streak = ref.watch(streakProvider).count;
+    final theme = ref.watch(appThemeProvider);
+    final fg = theme.dark ? Colors.white : MirraColors.ink;
 
     return GestureDetector(
       onTap: () => context.push('/profile'),
       behavior: HitTestBehavior.opaque,
-      child: Container(
+      child: Glass(
+        radius: MirraRadius.pill,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.7),
-          borderRadius: BorderRadius.circular(MirraRadius.pill),
-          border: Border.all(color: MirraColors.line),
-        ),
         child: Row(
           children: [
             AnimatedBuilder(
@@ -715,7 +727,11 @@ class _StreakBadgeState extends ConsumerState<_StreakBadge>
             const SizedBox(width: 5),
             Text(
               '$streak',
-              style: MirraType.cochin(size: 13, weight: FontWeight.w700),
+              style: MirraType.cochin(
+                size: 13,
+                weight: FontWeight.w700,
+                color: fg,
+              ),
             ),
           ],
         ),
@@ -724,49 +740,60 @@ class _StreakBadgeState extends ConsumerState<_StreakBadge>
   }
 }
 
-class _BottomNav extends StatelessWidget {
+class _BottomNav extends ConsumerWidget {
   const _BottomNav();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Adapt the nav foreground to the active theme: white on dark backgrounds,
+    // ink on light/near-white ones.
+    final theme = ref.watch(appThemeProvider);
+    final fg = theme.dark ? Colors.white : MirraColors.ink;
     return Positioned(
       left: 20,
       right: 20,
       bottom: 28,
       child: SafeArea(
         top: false,
-        child: Container(
+        child: Glass(
+          radius: MirraRadius.pill,
           height: 64,
           padding: const EdgeInsets.symmetric(horizontal: 18),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.78),
-            borderRadius: BorderRadius.circular(MirraRadius.pill),
-            border: Border.all(color: MirraColors.line),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 24,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _NavIcon(
-                icon: Icons.auto_awesome_rounded,
-                label: 'Mix',
-                onTap: () => context.push('/mix'),
+              Expanded(
+                child: _NavIcon(
+                  iconBuilder: (c) => MixGridIcon(size: 28, color: c),
+                  label: 'Mix',
+                  route: '/mix',
+                  fg: fg,
+                ),
               ),
-              _NavIcon(
-                icon: Icons.palette_outlined,
-                label: 'Theme',
-                onTap: () => context.push('/theme'),
+              Expanded(
+                child: _NavIcon(
+                  iconBuilder: (c) => NavAssetIcon(
+                    base: 'theme',
+                    size: 28,
+                    color: c,
+                    fallback: ThemePaletteIcon(size: 28, color: c),
+                  ),
+                  label: 'Theme',
+                  route: '/theme',
+                  fg: fg,
+                ),
               ),
-              _NavIcon(
-                icon: Icons.person_outline_rounded,
-                label: 'Profile',
-                onTap: () => context.push('/profile'),
+              Expanded(
+                child: _NavIcon(
+                  iconBuilder: (c) => NavAssetIcon(
+                    base: 'user',
+                    size: 28,
+                    color: c,
+                    fallback: ProfileUserIcon(size: 28, color: c),
+                  ),
+                  label: 'Profile',
+                  route: '/profile',
+                  fg: fg,
+                ),
               ),
             ],
           ),
@@ -778,30 +805,32 @@ class _BottomNav extends StatelessWidget {
 
 class _NavIcon extends StatelessWidget {
   const _NavIcon({
-    required this.icon,
+    required this.iconBuilder,
     required this.label,
-    required this.onTap,
+    required this.route,
+    required this.fg,
   });
-  final IconData icon;
+  final Widget Function(Color) iconBuilder;
   final String label;
-  final VoidCallback onTap;
+  final String route;
+  final Color fg;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () => context.push(route),
       behavior: HitTestBehavior.opaque,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: MirraColors.ink, size: 22),
+          iconBuilder(fg),
           const SizedBox(height: 2),
           Text(
             label,
-            style: MirraType.cochin(
-              size: 10,
-              color: MirraColors.muted,
-              weight: FontWeight.w500,
+            style: MirraType.carmenSans(
+              size: 11,
+              color: fg,
+              letterSpacing: 0.2,
             ),
           ),
         ],

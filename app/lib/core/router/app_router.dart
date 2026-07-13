@@ -11,6 +11,8 @@ import '../../features/onboarding/providers/onboarding_provider.dart';
 import '../../features/preferences/presentation/preferences_screen.dart';
 import '../../features/premium/presentation/paywall_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
+import '../../features/theme/presentation/create_theme_screen.dart';
+import '../../features/theme/presentation/theme_mixes_screen.dart';
 import '../../features/theme/presentation/theme_screen.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
@@ -35,6 +37,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const MyQuotesScreen(),
       ),
       GoRoute(path: '/theme', builder: (context, state) => const ThemeScreen()),
+      GoRoute(
+        path: '/theme/mixes',
+        builder: (context, state) => const ThemeMixesScreen(),
+      ),
+      GoRoute(
+        path: '/theme/create',
+        builder: (context, state) => const CreateThemeScreen(),
+      ),
       GoRoute(
         path: '/profile',
         builder: (context, state) => const ProfileScreen(),
