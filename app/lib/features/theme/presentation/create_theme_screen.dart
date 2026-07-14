@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/auth/auth_provider.dart';
 import '../../../core/theme/colors.dart';
 import '../../../core/theme/typography.dart';
 import '../app_theme_provider.dart';
@@ -199,10 +200,47 @@ class _CreateThemeScreenState extends ConsumerState<CreateThemeScreen> {
   Widget _label(String s) =>
       Text(s, style: MirraType.cochin(size: 15, weight: FontWeight.w700));
 
+  Future<bool> _confirmSignIn() async {
+    final go = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text('Sign in to add a photo',
+            style: MirraType.carmenSans(size: 18)),
+        content: Text(
+          'Photo themes are saved to your account so they stay with you '
+          'across devices and reinstalls.',
+          style: MirraType.carmenSans(
+              size: 14, color: MirraColors.muted, height: 1.35),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('Later',
+                style:
+                    MirraType.carmenSans(size: 14, color: MirraColors.muted)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('Sign in',
+                style: MirraType.carmenSans(size: 14, color: MirraColors.ink)),
+          ),
+        ],
+      ),
+    );
+    return go ?? false;
+  }
+
   Widget _photoButton() {
     return GestureDetector(
       onTap: () async {
         final router = GoRouter.of(context);
+        // Photo themes are account-tied → require sign-in first.
+        if (!ref.read(isSignedInProvider)) {
+          if (await _confirmSignIn()) router.push('/profile');
+          return;
+        }
         final ok = await ref.read(appThemeProvider.notifier).setCustomPhoto(
               font: _font,
               textColor: _text,

@@ -6,9 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/auth/auth_provider.dart';
 import '../../../core/theme/colors.dart';
 import '../../../core/theme/typography.dart';
 import '../app_theme_provider.dart';
+import '../my_themes_provider.dart';
+import '../theme_api.dart';
 import '../theme_catalog.dart';
 import 'theme_mix_card.dart';
 import 'theme_tile.dart';
@@ -35,6 +38,106 @@ class _ThemeScreenState extends ConsumerState<ThemeScreen> {
       default:
         return kAppThemes;
     }
+  }
+
+  /// The signed-in user's saved custom themes, shown above "For you".
+  /// Hidden when signed out or the account has no saved themes.
+  List<Widget> _myThemesSection() {
+    final signedIn = ref.watch(isSignedInProvider);
+    final mine = ref.watch(myThemesProvider);
+    final isEmpty = mine.maybeWhen(data: (l) => l.isEmpty, orElse: () => false);
+    if (!signedIn || isEmpty) return const [];
+    return [
+      const SizedBox(height: 22),
+      Text('My themes',
+          style: MirraType.cochin(size: 17, weight: FontWeight.w800)),
+      const SizedBox(height: 12),
+      SizedBox(
+        height: 150,
+        child: mine.when(
+          data: (list) => ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: list.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 10),
+            itemBuilder: (_, i) => _myThemeTile(list[i]),
+          ),
+          loading: () => const Center(
+            child: SizedBox(
+              width: 22,
+              height: 22,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          ),
+          error: (_, _) => Align(
+            alignment: Alignment.centerLeft,
+            child: Text('Couldn’t load your themes',
+                style: MirraType.cochin(size: 13, color: MirraColors.muted)),
+          ),
+        ),
+      ),
+    ];
+  }
+
+  Widget _myThemeTile(RemoteTheme rt) {
+    final font = ThemeFont.values.firstWhere(
+      (f) => f.name == rt.font,
+      orElse: () => ThemeFont.serif,
+    );
+    final textColor = Color(int.tryParse(rt.textColor, radix: 16) ?? 0xFFFFFFFF);
+    final theme = AppTheme(
+      id: 'custom',
+      label: 'My theme',
+      photoUrl: rt.imageUrl,
+      font: font,
+      textColor: textColor,
+      dark: rt.dark,
+      custom: true,
+    );
+    final active = ref.watch(appThemeProvider);
+    final selected = active.custom && active.photoUrl == rt.imageUrl;
+    return SizedBox(
+      width: 108,
+      child: GestureDetector(
+        onTap: () {
+          ref.read(appThemeProvider.notifier).applyRemoteTheme(rt);
+          context.pop();
+        },
+        behavior: HitTestBehavior.opaque,
+        child: Stack(
+          children: [
+            Container(
+              decoration:
+                  theme.tileDecoration(BorderRadius.circular(14)).copyWith(
+                        border: selected
+                            ? Border.all(color: MirraColors.ink, width: 2.5)
+                            : null,
+                      ),
+              alignment: Alignment.center,
+              child: Text('Aa', style: theme.quoteStyle(26)),
+            ),
+            Positioned(
+              top: 6,
+              right: 6,
+              child: GestureDetector(
+                onTap: () =>
+                    ref.read(myThemesProvider.notifier).delete(rt.themeId),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  width: 22,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.45),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close_rounded,
+                      size: 14, color: Colors.white),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -174,6 +277,7 @@ class _ThemeScreenState extends ConsumerState<ThemeScreen> {
                       ],
                     ),
                   ),
+                  ..._myThemesSection(),
                   const SizedBox(height: 22),
                   Text(
                     'For you',
