@@ -58,6 +58,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final answers = ref.watch(onboardingProvider);
     final selected = answers[_q.id];
     final isLast = _index == kOnboardingQuestions.length - 1;
+    final isMulti = _q.isMulti;
 
     return Scaffold(
       body: AppBackground(
@@ -87,15 +88,29 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 const SizedBox(height: MirraSpace.xl),
                 Expanded(
                   child: SingleChildScrollView(
-                    child: AnswerChips(question: _q),
+                    child: AnswerChips(
+                      question: _q,
+                      // Single-choice questions auto-advance on tap (no button).
+                      onSingleSelect: isMulti
+                          ? null
+                          : () => Future.delayed(
+                                const Duration(milliseconds: 220),
+                                () {
+                                  if (mounted) _next();
+                                },
+                              ),
+                    ),
                   ),
                 ),
-                PrimaryButton(
-                  label: isLast ? 'Start Mirra' : 'Continue',
-                  onPressed: selected == null ? null : _next,
-                  gradient: isLast,
-                ),
-                const SizedBox(height: MirraSpace.md),
+                // Only multi-select questions keep a confirm button.
+                if (isMulti) ...[
+                  PrimaryButton(
+                    label: isLast ? 'Start Mirra' : 'Continue',
+                    onPressed: selected == null ? null : _next,
+                    gradient: isLast,
+                  ),
+                  const SizedBox(height: MirraSpace.md),
+                ],
               ],
             ),
           ),
