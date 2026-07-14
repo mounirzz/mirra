@@ -102,14 +102,14 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                       Text(
                         'How your free\ntrial works',
                         textAlign: TextAlign.center,
-                        style: MirraType.serif(size: 34, height: 1.12),
+                        style: MirraType.carmenSans(size: 32, height: 1.12),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         "You won't be charged anything today",
                         textAlign: TextAlign.center,
-                        style: MirraType.cochin(
-                          size: 15,
+                        style: MirraType.carmenSans(
+                          size: 14,
                           color: MirraColors.muted,
                         ),
                       ),
@@ -132,23 +132,22 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                       Text.rich(
                         TextSpan(
                           text: 'Unlimited free access for 3 days, then ',
-                          style: MirraType.cochin(
-                            size: 12.5,
+                          style: MirraType.carmenSans(
+                            size: 12,
                             color: MirraColors.ink2,
                           ),
                           children: [
                             TextSpan(
                               text: '$price/year',
-                              style: MirraType.cochin(
-                                size: 12.5,
-                                weight: FontWeight.w700,
-                                color: MirraColors.ink2,
+                              style: MirraType.carmenSans(
+                                size: 12,
+                                color: MirraColors.ink,
                               ),
                             ),
                             TextSpan(
                               text: '  (3,75 €/mo)',
-                              style: MirraType.cochin(
-                                size: 12.5,
+                              style: MirraType.carmenSans(
+                                size: 12,
                                 color: MirraColors.muted,
                               ),
                             ),
@@ -282,16 +281,13 @@ class _TrialTimeline extends StatelessWidget {
                             const SizedBox(height: 2),
                             Text(
                               _steps[i].$2,
-                              style: MirraType.cochin(
-                                size: 17,
-                                weight: FontWeight.w700,
-                              ),
+                              style: MirraType.carmenSans(size: 17),
                             ),
                             const SizedBox(height: 3),
                             Text(
                               _steps[i].$3,
-                              style: MirraType.cochin(
-                                size: 13.5,
+                              style: MirraType.carmenSans(
+                                size: 13,
                                 color: MirraColors.muted,
                                 height: 1.35,
                               ),
@@ -330,7 +326,7 @@ class _ReminderToggle extends StatelessWidget {
           Expanded(
             child: Text(
               'Reminder before trial ends',
-              style: MirraType.cochin(size: 14, weight: FontWeight.w700),
+              style: MirraType.carmenSans(size: 14),
             ),
           ),
           GestureDetector(
@@ -383,7 +379,7 @@ class _LegalLink extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: Text(
         label,
-        style: MirraType.cochin(size: 12, color: MirraColors.muted),
+        style: MirraType.carmenSans(size: 12, color: MirraColors.muted),
       ),
     );
   }
