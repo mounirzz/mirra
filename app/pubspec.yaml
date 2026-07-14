@@ -29,6 +29,12 @@ dependencies:
   cached_network_image: ^3.4.1
   flutter_cache_manager: ^3.4.1
 
+  # Auth (Cognito Hosted UI OAuth + PKCE) and account-tied theme sync.
+  flutter_web_auth_2: ^4.1.0
+  flutter_secure_storage: ^9.2.4
+  crypto: ^3.0.6
+  http: ^1.2.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

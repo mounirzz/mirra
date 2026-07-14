@@ -21,9 +21,10 @@ class AuthConfig {
   static const apiBaseUrl =
       'https://fjpayb0sm9.execute-api.us-east-1.amazonaws.com';
 
-  /// Deep links the Hosted UI redirects back to.
+  /// Deep link the Hosted UI redirects back to (login + logout both registered
+  /// on the Cognito app client as `mirra://auth`).
   static const redirectUri = 'mirra://auth';
-  static const signOutUri = 'mirra://signout';
+  static const signOutUri = 'mirra://auth';
 
   static const scopes = ['openid', 'email', 'profile'];
 

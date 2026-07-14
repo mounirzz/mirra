@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/auth/auth_provider.dart';
 import '../../../core/theme/colors.dart';
 import '../../../core/theme/spacing.dart';
 import '../../../core/theme/typography.dart';
@@ -102,6 +103,8 @@ class ProfileScreen extends ConsumerWidget {
                     40,
                   ),
                   children: [
+                    const _AccountCard(),
+                    const SizedBox(height: MirraSpace.lg),
                     Row(
                       children: [
                         Expanded(
@@ -240,6 +243,190 @@ class ProfileScreen extends ConsumerWidget {
                   ],
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Sign-in / account block. Signed out → Apple + Google buttons. Signed in →
+/// the account email + sign out. Login is optional; it exists so custom themes
+/// can be tied to the account (see theme upload).
+class _AccountCard extends ConsumerWidget {
+  const _AccountCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final auth = ref.watch(authProvider);
+
+    if (auth.status == AuthStatus.signedIn) {
+      return Container(
+        padding: const EdgeInsets.all(MirraSpace.md),
+        decoration: BoxDecoration(
+          color: MirraColors.surface,
+          borderRadius: BorderRadius.circular(MirraRadius.lg),
+          border: Border.all(color: MirraColors.line),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: const BoxDecoration(
+                gradient: MirraColors.gradSoft,
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: const Icon(Icons.person_rounded,
+                  color: MirraColors.ink, size: 22),
+            ),
+            const SizedBox(width: MirraSpace.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Signed in',
+                    style: MirraType.carmenSans(
+                        size: 12, color: MirraColors.muted),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    auth.email ?? 'Your account',
+                    style: MirraType.carmenSans(size: 15),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            GestureDetector(
+              onTap: () => ref.read(authProvider.notifier).signOut(),
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                child: Text(
+                  'Sign out',
+                  style: MirraType.carmenSans(
+                      size: 13, color: MirraColors.muted),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final busy = auth.busy;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Save your themes', style: MirraType.carmenSans(size: 16)),
+        const SizedBox(height: 4),
+        Text(
+          'Sign in to keep your custom themes tied to your account — on every '
+          'device, even after reinstalling.',
+          style: MirraType.carmenSans(
+              size: 13, color: MirraColors.muted, height: 1.3),
+        ),
+        const SizedBox(height: MirraSpace.md),
+        _SignInButton(
+          onTap:
+              busy ? null : () => ref.read(authProvider.notifier).signInWithApple(),
+          bg: Colors.black,
+          fg: Colors.white,
+          icon: const Icon(Icons.apple, color: Colors.white, size: 22),
+          label: 'Continue with Apple',
+        ),
+        const SizedBox(height: 10),
+        _SignInButton(
+          onTap: busy
+              ? null
+              : () => ref.read(authProvider.notifier).signInWithGoogle(),
+          bg: Colors.white,
+          fg: MirraColors.ink,
+          border: MirraColors.line,
+          icon: Container(
+            width: 22,
+            alignment: Alignment.center,
+            child: const Text(
+              'G',
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: 17,
+                color: Color(0xFF4285F4),
+              ),
+            ),
+          ),
+          label: 'Continue with Google',
+        ),
+        if (busy) ...[
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(
+                width: 14,
+                height: 14,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+              const SizedBox(width: 8),
+              Text('One moment…',
+                  style: MirraType.carmenSans(
+                      size: 12, color: MirraColors.muted)),
+            ],
+          ),
+        ],
+        if (auth.error != null) ...[
+          const SizedBox(height: 8),
+          Text(auth.error!,
+              style: MirraType.carmenSans(
+                  size: 12, color: const Color(0xFFCB4B3F))),
+        ],
+      ],
+    );
+  }
+}
+
+class _SignInButton extends StatelessWidget {
+  const _SignInButton({
+    required this.onTap,
+    required this.bg,
+    required this.fg,
+    required this.icon,
+    required this.label,
+    this.border,
+  });
+
+  final VoidCallback? onTap;
+  final Color bg;
+  final Color fg;
+  final Widget icon;
+  final String label;
+  final Color? border;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Opacity(
+        opacity: onTap == null ? 0.5 : 1,
+        child: Container(
+          height: 52,
+          decoration: BoxDecoration(
+            color: bg,
+            borderRadius: BorderRadius.circular(MirraRadius.pill),
+            border: border != null ? Border.all(color: border!) : null,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              icon,
+              const SizedBox(width: 10),
+              Text(label, style: MirraType.carmenSans(size: 15, color: fg)),
             ],
           ),
         ),
