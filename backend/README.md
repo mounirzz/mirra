@@ -52,6 +52,20 @@ sam deploy --guided \
     GoogleClientSecret=xxxx
 ```
 
+> **⚠️ Apple private key format — the #1 deploy failure.**
+> Cognito's Apple IdP expects `ApplePrivateKey` to be the **base64 body of the
+> `.p8` only** — strip the `-----BEGIN/END PRIVATE KEY-----` lines and all
+> newlines. Passing the full PEM fails at stack-create with
+> *"Provided private key cannot be used for Sign in with Apple"* (the
+> credentials are fine; Cognito just can't parse the armored PEM). Extract it:
+> ```bash
+> grep -v 'PRIVATE KEY' AuthKey_XXXXXXXXXX.p8 | tr -d '\n'
+> ```
+> Multi-line/space values also get mangled by CLI `--parameter-overrides`; pass
+> params via a `samconfig.toml` (`parameter_overrides = [ ... ]` list form,
+> `sam deploy --config-file`) to avoid shell splitting. Deployed values live in
+> `app/lib/core/auth/auth_config.dart`.
+
 ## 3. Wire the app
 
 After deploy, note the stack **Outputs**:
