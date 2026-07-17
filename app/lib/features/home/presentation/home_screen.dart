@@ -13,6 +13,9 @@ import '../../../core/theme/colors.dart';
 import '../../../core/theme/palette_provider.dart';
 import '../../../core/theme/spacing.dart';
 import '../../../core/theme/typography.dart';
+import '../../../core/i18n/strings.dart';
+import '../../../core/i18n/language_provider.dart';
+import '../../../data/seed_quotes_fr.dart';
 import '../../../shared/models/quote.dart';
 import '../../../shared/widgets/app_background.dart';
 import '../../../shared/widgets/primary_button.dart';
@@ -413,8 +416,12 @@ class _QuoteCardState extends ConsumerState<_QuoteCard>
     final onDark = theme.dark || theme.isPhoto || theme.custom;
     // Glass-control foreground: white on dark backgrounds, ink on light ones.
     final navFg = theme.dark ? Colors.white : MirraColors.ink;
-    final quoteText =
-        theme.caps ? quote.text.toUpperCase() : quote.text;
+    final localized = localizedQuoteText(
+      quote.id,
+      quote.text,
+      ref.watch(languageProvider).code,
+    );
+    final quoteText = theme.caps ? localized.toUpperCase() : localized;
     return Container(
       decoration: _themeBackground(theme),
       child: GestureDetector(
@@ -432,7 +439,7 @@ class _QuoteCardState extends ConsumerState<_QuoteCard>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      quote.category.label.toUpperCase(),
+                      ref.tr(quote.category.label).toUpperCase(),
                       style: MirraType.eyebrow.copyWith(
                         color: onDark
                             ? Colors.white.withValues(alpha: 0.75)
@@ -446,7 +453,7 @@ class _QuoteCardState extends ConsumerState<_QuoteCard>
                     ),
                     const SizedBox(height: 22),
                     Text(
-                      boostFor(quote),
+                      ref.tr(boostFor(quote)),
                       style: MirraType.cochin(
                         size: 17,
                         color: onDark
@@ -706,7 +713,7 @@ class _StreakBadgeState extends ConsumerState<_StreakBadge>
     final fg = theme.dark ? Colors.white : MirraColors.ink;
 
     return GestureDetector(
-      onTap: () => context.push('/profile'),
+      onTap: () => context.push('/streak'),
       behavior: HitTestBehavior.opaque,
       child: Glass(
         radius: MirraRadius.pill,
@@ -764,7 +771,7 @@ class _BottomNav extends ConsumerWidget {
               Expanded(
                 child: _NavIcon(
                   iconBuilder: (c) => MixGridIcon(size: 28, color: c),
-                  label: 'Mix',
+                  label: ref.tr('Mix'),
                   route: '/mix',
                   fg: fg,
                 ),
@@ -777,7 +784,7 @@ class _BottomNav extends ConsumerWidget {
                     color: c,
                     fallback: ThemePaletteIcon(size: 28, color: c),
                   ),
-                  label: 'Theme',
+                  label: ref.tr('Theme'),
                   route: '/theme',
                   fg: fg,
                 ),
@@ -790,7 +797,7 @@ class _BottomNav extends ConsumerWidget {
                     color: c,
                     fallback: ProfileUserIcon(size: 28, color: c),
                   ),
-                  label: 'Profile',
+                  label: ref.tr('Profile'),
                   route: '/profile',
                   fg: fg,
                 ),

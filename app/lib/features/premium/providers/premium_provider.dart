@@ -119,10 +119,13 @@ class PremiumNotifier extends StateNotifier<PremiumState> {
       );
       if (!isOurs) continue;
 
+      final plan = MirraPlan.values
+          .where((p) => p.productId == purchase.productID)
+          .firstOrNull;
       switch (purchase.status) {
         case PurchaseStatus.purchased:
         case PurchaseStatus.restored:
-          await _grantPremium();
+          await _grantPremium(plan);
         case PurchaseStatus.error:
         case PurchaseStatus.canceled:
           if (mounted) state = state.copyWith(purchasing: false);
@@ -144,7 +147,7 @@ class PremiumNotifier extends StateNotifier<PremiumState> {
       if (kDebugMode) {
         state = state.copyWith(purchasing: true);
         await Future<void>.delayed(const Duration(milliseconds: 600));
-        await _grantPremium();
+        await _grantPremium(plan);
       }
       return;
     }
@@ -160,8 +163,15 @@ class PremiumNotifier extends StateNotifier<PremiumState> {
     }
   }
 
-  Future<void> _grantPremium() async {
-    await MirraBoxes.updatePrefs((p) => p.copyWith(isPremium: true));
+  Future<void> _grantPremium(MirraPlan? plan) async {
+    await MirraBoxes.updatePrefs(
+      (p) => p.copyWith(
+        isPremium: true,
+        premiumPlan: plan?.label ?? p.premiumPlan ?? 'Mirra+',
+        premiumSince:
+            p.premiumSince ?? DateTime.now().toIso8601String().substring(0, 10),
+      ),
+    );
     if (mounted) {
       state = state.copyWith(isPremium: true, purchasing: false);
     }

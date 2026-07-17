@@ -14,6 +14,11 @@ class UserPrefs {
     this.notificationsEnabled = true,
     this.isPremium = false,
     this.languageCode = 'en',
+    this.displayName,
+    this.themeVolume = 0.5,
+    this.mutedCategories = const [],
+    this.premiumPlan,
+    this.premiumSince,
   });
 
   bool onboardingComplete;
@@ -39,6 +44,19 @@ class UserPrefs {
   /// UI language ('en' or 'fr').
   String languageCode;
 
+  /// First name used to personalize content (Preferences > Name).
+  String? displayName;
+
+  /// Theme sound volume, 0..1 (Preferences > Sound).
+  double themeVolume;
+
+  /// Category ids hidden from the feed (Preferences > Muted content).
+  List<String> mutedCategories;
+
+  /// Purchased Mirra+ plan name and ISO date, for Manage subscription.
+  String? premiumPlan;
+  String? premiumSince;
+
   UserPrefs copyWith({
     bool? onboardingComplete,
     Map<String, String>? answers,
@@ -52,6 +70,11 @@ class UserPrefs {
     bool? notificationsEnabled,
     bool? isPremium,
     String? languageCode,
+    String? displayName,
+    double? themeVolume,
+    List<String>? mutedCategories,
+    String? premiumPlan,
+    String? premiumSince,
   }) {
     return UserPrefs(
       onboardingComplete: onboardingComplete ?? this.onboardingComplete,
@@ -66,6 +89,11 @@ class UserPrefs {
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       isPremium: isPremium ?? this.isPremium,
       languageCode: languageCode ?? this.languageCode,
+      displayName: displayName ?? this.displayName,
+      themeVolume: themeVolume ?? this.themeVolume,
+      mutedCategories: mutedCategories ?? this.mutedCategories,
+      premiumPlan: premiumPlan ?? this.premiumPlan,
+      premiumSince: premiumSince ?? this.premiumSince,
     );
   }
 }
@@ -93,13 +121,18 @@ class UserPrefsAdapter extends TypeAdapter<UserPrefs> {
       notificationsEnabled: fields[9] as bool? ?? true,
       isPremium: fields[10] as bool? ?? false,
       languageCode: fields[11] as String? ?? 'en',
+      displayName: fields[12] as String?,
+      themeVolume: (fields[13] as num?)?.toDouble() ?? 0.5,
+      mutedCategories: (fields[14] as List?)?.cast<String>() ?? const [],
+      premiumPlan: fields[15] as String?,
+      premiumSince: fields[16] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserPrefs obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(17)
       ..writeByte(0)
       ..write(obj.onboardingComplete)
       ..writeByte(1)
@@ -123,6 +156,16 @@ class UserPrefsAdapter extends TypeAdapter<UserPrefs> {
       ..writeByte(10)
       ..write(obj.isPremium)
       ..writeByte(11)
-      ..write(obj.languageCode);
+      ..write(obj.languageCode)
+      ..writeByte(12)
+      ..write(obj.displayName)
+      ..writeByte(13)
+      ..write(obj.themeVolume)
+      ..writeByte(14)
+      ..write(obj.mutedCategories)
+      ..writeByte(15)
+      ..write(obj.premiumPlan)
+      ..writeByte(16)
+      ..write(obj.premiumSince);
   }
 }

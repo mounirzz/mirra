@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/i18n/strings.dart';
 import '../../../core/theme/colors.dart';
 import '../../../core/theme/spacing.dart';
 import '../../../core/theme/typography.dart';
@@ -57,10 +58,46 @@ class MyQuotesScreen extends ConsumerWidget {
     final quotes = ref.watch(ownQuotesProvider);
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _openEditor(context, ref),
-        backgroundColor: MirraColors.ink,
-        child: const Icon(Icons.add_rounded, color: Colors.white),
+      // Full-width add bar pinned above the bottom safe area.
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            MirraSpace.lg,
+            MirraSpace.sm,
+            MirraSpace.lg,
+            MirraSpace.md,
+          ),
+          child: GestureDetector(
+            onTap: () => _openEditor(context, ref),
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              height: 56,
+              decoration: BoxDecoration(
+                color: MirraColors.ink,
+                borderRadius: BorderRadius.circular(MirraRadius.pill),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.add_rounded,
+                    color: Colors.white,
+                    size: 22,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    ref.tr('Add your affirmation'),
+                    style: MirraType.carmenSans(
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
       body: AppBackground(
         child: SafeArea(
@@ -75,7 +112,7 @@ class MyQuotesScreen extends ConsumerWidget {
                     MirraBackButton(onTap: () => context.pop()),
                     const SizedBox(width: 8),
                     Text(
-                      'My affirmations',
+                      ref.tr('My affirmations'),
                       style: MirraType.cochin(
                         size: 26,
                         weight: FontWeight.w700,
@@ -91,7 +128,7 @@ class MyQuotesScreen extends ConsumerWidget {
                         child: Padding(
                           padding: const EdgeInsets.all(40),
                           child: Text(
-                            'Write your own affirmations —\nwhat you tell yourself matters most.',
+                            ref.tr('Write your own affirmations —\nwhat you tell yourself matters most.'),
                             textAlign: TextAlign.center,
                             style: MirraType.cochin(
                               size: 15,

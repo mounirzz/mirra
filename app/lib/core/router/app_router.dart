@@ -9,8 +9,10 @@ import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/onboarding/presentation/welcome_screen.dart';
 import '../../features/onboarding/providers/onboarding_provider.dart';
 import '../../features/preferences/presentation/preferences_screen.dart';
+import '../../features/preferences/presentation/preferences_subscreens.dart';
 import '../../features/premium/presentation/paywall_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
+import '../../features/streak/presentation/streak_hub_screen.dart';
 import '../../features/theme/presentation/create_theme_screen.dart';
 import '../../features/theme/presentation/theme_mixes_screen.dart';
 import '../../features/theme/presentation/theme_screen.dart';
@@ -46,12 +48,48 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const CreateThemeScreen(),
       ),
       GoRoute(
+        path: '/streak',
+        builder: (context, state) => const StreakHubScreen(),
+      ),
+      GoRoute(
         path: '/profile',
         builder: (context, state) => const ProfileScreen(),
       ),
       GoRoute(
         path: '/preferences',
         builder: (context, state) => const PreferencesScreen(),
+      ),
+      GoRoute(
+        path: '/preferences/subscription',
+        builder: (context, state) => const ManageSubscriptionScreen(),
+      ),
+      GoRoute(
+        path: '/preferences/content',
+        builder: (context, state) => const ContentPrefsScreen(),
+      ),
+      GoRoute(
+        path: '/preferences/gender',
+        builder: (context, state) => const GenderScreen(),
+      ),
+      GoRoute(
+        path: '/preferences/muted',
+        builder: (context, state) => const MutedContentScreen(),
+      ),
+      GoRoute(
+        path: '/preferences/language',
+        builder: (context, state) => const LanguageScreen(),
+      ),
+      GoRoute(
+        path: '/preferences/name',
+        builder: (context, state) => const NameScreen(),
+      ),
+      GoRoute(
+        path: '/preferences/sound',
+        builder: (context, state) => const SoundScreen(),
+      ),
+      GoRoute(
+        path: '/preferences/reminders',
+        builder: (context, state) => const RemindersScreen(),
       ),
       GoRoute(
         path: '/paywall',

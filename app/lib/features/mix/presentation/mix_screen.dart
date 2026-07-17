@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/i18n/strings.dart';
 import '../../../core/theme/colors.dart';
 import '../../../core/theme/spacing.dart';
 import '../../../core/theme/typography.dart';
@@ -38,7 +39,7 @@ class MixScreen extends ConsumerWidget {
                     MirraBackButton(onTap: () => context.pop()),
                     const SizedBox(width: 8),
                     Text(
-                      'Mix',
+                      ref.tr('Mix'),
                       style: MirraType.cochin(
                         size: 26,
                         weight: FontWeight.w700,
@@ -51,7 +52,7 @@ class MixScreen extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: MirraSpace.lg),
                 child: Text(
-                  'Pick one or more categories to shape your feed.',
+                  ref.tr('Pick one or more categories to shape your feed.'),
                   style: MirraType.cochin(size: 14, color: MirraColors.muted),
                 ),
               ),
@@ -67,7 +68,7 @@ class MixScreen extends ConsumerWidget {
                     runSpacing: 10,
                     children: [
                       _MixChip(
-                        label: 'All',
+                        label: ref.tr('All'),
                         selected: selected.isEmpty,
                         onTap: () =>
                             ref
@@ -77,7 +78,7 @@ class MixScreen extends ConsumerWidget {
                       ),
                       for (final category in QuoteCategory.all)
                         _MixChip(
-                          label: category.label,
+                          label: ref.tr(category.label),
                           selected: selected.contains(category.id),
                           onTap: () => toggle(category.id),
                         ),

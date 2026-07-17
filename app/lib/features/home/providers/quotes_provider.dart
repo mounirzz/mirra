@@ -6,6 +6,7 @@ import '../../../data/seed_quotes.dart';
 import '../../../shared/models/quote.dart';
 import '../../my_quotes/providers/own_quotes_provider.dart';
 import '../../onboarding/providers/onboarding_provider.dart';
+import '../../preferences/providers/settings_providers.dart';
 import '../../premium/providers/premium_provider.dart';
 
 /// The user's own affirmations lead the feed, followed by the seed catalog.
@@ -48,6 +49,13 @@ final filteredQuotesProvider = Provider<List<Quote>>((ref) {
   // them (they can still opt back in through Mix).
   if (answers['religion'] == 'No') {
     quotes = quotes.where((q) => q.categoryId != 'faith').toList();
+  }
+
+  // Muted topics (Preferences > Muted content) never show in the feed.
+  final mutedCats = ref.watch(mutedCategoriesProvider);
+  if (mutedCats.isNotEmpty) {
+    quotes =
+        quotes.where((q) => !mutedCats.contains(q.categoryId)).toList();
   }
 
   // Deterministic daily shuffle: same order all day, fresh stack tomorrow.
