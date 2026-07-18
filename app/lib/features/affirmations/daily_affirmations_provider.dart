@@ -7,6 +7,7 @@ import '../../core/i18n/language_provider.dart';
 import '../../shared/models/quote.dart';
 import '../home/providers/quotes_provider.dart';
 import '../onboarding/providers/onboarding_provider.dart';
+import '../preferences/providers/content_topics_provider.dart';
 import 'affirmation_api.dart';
 import 'affirmation_context.dart';
 
@@ -16,9 +17,14 @@ const _topicToCategory = {
   'confidence': 'confidence',
   'self_worth': 'confidence',
   'self_image': 'confidence',
+  'self_esteem': 'confidence',
   'women': 'women',
   'motivation': 'motivation',
+  'inspiration': 'motivation',
   'discipline': 'motivation',
+  'hard_times': 'healing',
+  'letting_go': 'healing',
+  'positivity': 'happiness',
   'focus': 'productivity',
   'productivity': 'productivity',
   'success': 'success',
@@ -65,6 +71,7 @@ class DailyAffirmationsNotifier extends StateNotifier<List<Quote>> {
     _ref.listen(onboardingProvider, (_, _) => _scheduleReload());
     _ref.listen(languageProvider, (_, _) => _scheduleReload());
     _ref.listen(selectedCategoriesProvider, (_, _) => _scheduleReload());
+    _ref.listen(contentTopicsProvider, (_, _) => _scheduleReload());
   }
 
   final Ref _ref;
@@ -89,10 +96,15 @@ class DailyAffirmationsNotifier extends StateNotifier<List<Quote>> {
     if (_loading) return;
     _loading = true;
     try {
+      // The topics picked in Content preferences are the primary subjects,
+      // plus any active Mix selection.
       final context = buildAffirmationContext(
         answers: _ref.read(onboardingProvider),
         language: _ref.read(languageProvider).code,
-        extraTopics: _ref.read(selectedCategoriesProvider).toList(),
+        extraTopics: [
+          ..._ref.read(contentTopicsProvider),
+          ..._ref.read(selectedCategoriesProvider),
+        ],
       );
       final localDate = _todayLocal();
       final list = await _ref

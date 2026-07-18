@@ -10,10 +10,10 @@ import '../../../core/theme/colors.dart';
 import '../../../core/theme/typography.dart';
 import '../../../shared/models/quote.dart';
 import '../../../shared/widgets/chip_option.dart';
-import '../../onboarding/presentation/answer_chips.dart';
 import '../../onboarding/presentation/onboarding_questions.dart';
 import '../../onboarding/providers/onboarding_provider.dart';
 import '../../premium/providers/premium_provider.dart';
+import '../providers/content_topics_provider.dart';
 import '../providers/notifications_provider.dart';
 import '../providers/settings_providers.dart';
 import 'settings_widgets.dart';
@@ -432,97 +432,75 @@ class _TimelineRow extends StatelessWidget {
   }
 }
 
-// ─── Content preferences (onboarding answers) ───────────────────────────
+// ─── Content preferences (affirmation topics) ───────────────────────────
 
 class ContentPrefsScreen extends ConsumerWidget {
   const ContentPrefsScreen({super.key});
 
-  Future<void> _edit(
-    BuildContext context,
-    WidgetRef ref,
-    OnbQuestion question,
-  ) async {
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (sheetContext) => Padding(
-        padding: EdgeInsets.fromLTRB(
-          20,
-          20,
-          20,
-          MediaQuery.of(sheetContext).viewInsets.bottom + 32,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              question.title,
-              style: MirraType.cochin(size: 20, weight: FontWeight.w700),
-            ),
-            const SizedBox(height: 16),
-            AnswerChips(question: question),
-          ],
-        ),
-      ),
-    );
-    await ref.read(onboardingProvider.notifier).persist();
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final answers = ref.watch(onboardingProvider);
-    // Gender has its own screen; reminders their own too.
-    final questions = kOnboardingQuestions
-        .where((q) => !['gender', 'time', 'frequency'].contains(q.id))
-        .toList();
+    final selected = ref.watch(contentTopicsProvider);
 
     return SettingsSubScreen(
       title: ref.tr('Content preferences'),
-      subtitle: ref.tr('Your answers shape which affirmations you see.'),
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+      subtitle: ref.tr('Select all topics that interest you.'),
+      child: GridView.count(
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
+        crossAxisCount: 2,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+        childAspectRatio: 2.5,
         children: [
-          for (final q in questions)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: GestureDetector(
-                onTap: () => _edit(context, ref, q),
-                behavior: HitTestBehavior.opaque,
-                child: Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF4F2F8),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        q.title,
-                        style: MirraType.cochin(
-                          size: 13,
-                          color: MirraColors.muted,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        answers[q.id] ?? 'Not set',
-                        style: MirraType.cochin(
-                          size: 15,
-                          weight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+          for (final (id, label) in kContentTopics)
+            _TopicChip(
+              label: ref.tr(label),
+              selected: selected.contains(id),
+              onTap: () => ref.read(contentTopicsProvider.notifier).toggle(id),
             ),
         ],
+      ),
+    );
+  }
+}
+
+class _TopicChip extends StatelessWidget {
+  const _TopicChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 140),
+        curve: Curves.easeOut,
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: selected ? MirraColors.chip : Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: selected ? MirraColors.ink : MirraColors.line,
+            width: selected ? 1.6 : 1.2,
+          ),
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: MirraType.cochin(
+            size: 15,
+            weight: selected ? FontWeight.w800 : FontWeight.w600,
+            color: MirraColors.ink,
+          ),
+        ),
       ),
     );
   }
