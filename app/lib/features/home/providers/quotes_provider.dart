@@ -65,19 +65,13 @@ final filteredQuotesProvider = Provider<List<Quote>>((ref) {
         quotes.where((q) => !mutedCats.contains(q.categoryId)).toList();
   }
 
-  // Content preferences: restrict the catalog to the chosen topics' categories
-  // (applies to the seed fallback and the AI feed alike). Guarded so it never
-  // empties the feed if nothing matches.
+  // The topics chosen in Content preferences → feed categories (used below to
+  // lead the feed with those topics).
   final contentCats = ref
       .watch(contentTopicsProvider)
       .map((t) => kContentTopicCategory[t])
       .whereType<String>()
       .toSet();
-  if (contentCats.isNotEmpty) {
-    final narrowed =
-        quotes.where((q) => contentCats.contains(q.categoryId)).toList();
-    if (narrowed.isNotEmpty) quotes = narrowed;
-  }
 
   // Deterministic daily shuffle: same order all day, fresh stack tomorrow.
   final today = DateTime.now();
@@ -97,6 +91,19 @@ final filteredQuotesProvider = Provider<List<Quote>>((ref) {
       ...quotes.where((q) => boosted.contains(q.categoryId)),
       ...quotes.where((q) => !boosted.contains(q.categoryId)),
     ];
+  }
+
+  // Content preferences take precedence: lead the feed with the chosen topics.
+  // Show only them when there's enough on-topic content (the AI generates a
+  // full set); otherwise lead with them and top up so the feed is never tiny.
+  if (contentCats.isNotEmpty) {
+    final matching =
+        quotes.where((q) => contentCats.contains(q.categoryId)).toList();
+    final rest =
+        quotes.where((q) => !contentCats.contains(q.categoryId)).toList();
+    quotes = matching.length >= _dailyBatchSize
+        ? matching
+        : [...matching, ...rest];
   }
 
   // Mirra+ removes the daily cap entirely.
