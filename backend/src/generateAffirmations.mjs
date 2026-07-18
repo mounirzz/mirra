@@ -23,6 +23,7 @@ import {
   validateAffirmations,
   dedupe,
   normalizeText,
+  prefsSignature,
   FALLBACK,
 } from "./_affirmations.mjs";
 
@@ -111,13 +112,16 @@ export const handler = async (event) => {
 
   const localDate = isValidDate(body.localDate) ? body.localDate : isoDate(new Date());
   const ctx = applyDefaults(body);
+  const signature = prefsSignature(ctx);
+  const force = body.force === true;
 
-  // 1. Same day → same affirmations.
+  // 1. Same day AND same preferences → reuse the day's set. If the user changed
+  //    a preference (signature differs) — or asks to force — we regenerate.
   try {
     const cached = await ddb.send(
       new GetCommand({ TableName: TABLE, Key: { userId: uid, localDate } }),
     );
-    if (cached.Item?.affirmations?.length) {
+    if (!force && cached.Item?.affirmations?.length && cached.Item.prefsSignature === signature) {
       return json(200, { affirmations: cached.Item.affirmations, cached: true, date: localDate });
     }
   } catch (e) {
@@ -169,6 +173,7 @@ export const handler = async (event) => {
             userId: uid,
             localDate,
             affirmations,
+            prefsSignature: signature,
             model: OPENAI_MODEL,
             createdAt: Date.now(),
           },

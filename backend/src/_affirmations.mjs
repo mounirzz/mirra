@@ -172,6 +172,25 @@ export function validateAffirmations(parsed, count) {
   return { affirmations: cleaned, enough: cleaned.length >= Math.ceil(count * 0.6) };
 }
 
+/**
+ * A stable signature of the *preferences* in a context (order-independent).
+ * Same preferences → same signature → the day's cached set is reused; when the
+ * user changes a preference the signature changes and we regenerate.
+ */
+export function prefsSignature(ctx) {
+  const norm = {
+    ageRange: ctx.ageRange || "",
+    currentMood: ctx.currentMood || "",
+    moodFactors: [...(ctx.moodFactors || [])].sort(),
+    motivationSources: [...(ctx.motivationSources || [])].sort(),
+    preferredTopics: [...(ctx.preferredTopics || [])].sort(),
+    customAnswers: [...(ctx.customAnswers || [])].map((s) => s.toLowerCase()).sort(),
+    language: ctx.language || "en",
+    count: ctx.count || 10,
+  };
+  return JSON.stringify(norm);
+}
+
 /** Drops affirmations whose normalized text collides with a recent one. */
 export function dedupe(affirmations, recentNormalized) {
   const seen = new Set(recentNormalized);

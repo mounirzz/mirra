@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/auth/auth_provider.dart';
@@ -57,12 +59,31 @@ class DailyAffirmationsNotifier extends StateNotifier<List<Quote>> {
       (_, signedIn) => signedIn ? _load() : state = const [],
       fireImmediately: true,
     );
+    // Regenerate when the user changes what drives the affirmations. The
+    // backend only re-calls the model if the preference signature actually
+    // changed, so unrelated edits are cheap. Debounced to batch rapid edits.
+    _ref.listen(onboardingProvider, (_, _) => _scheduleReload());
+    _ref.listen(languageProvider, (_, _) => _scheduleReload());
+    _ref.listen(selectedCategoriesProvider, (_, _) => _scheduleReload());
   }
 
   final Ref _ref;
   bool _loading = false;
+  Timer? _debounce;
 
   Future<void> refresh() => _load();
+
+  void _scheduleReload() {
+    if (!_ref.read(isSignedInProvider)) return;
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 800), _load);
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
+  }
 
   Future<void> _load() async {
     if (_loading) return;

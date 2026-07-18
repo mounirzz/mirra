@@ -7,6 +7,7 @@ import {
   validateAffirmations,
   dedupe,
   normalizeText,
+  prefsSignature,
   DEFAULTS,
 } from "../src/_affirmations.mjs";
 
@@ -90,6 +91,29 @@ test("validateAffirmations caps at requested count", () => {
 
 test("normalizeText lowercases and strips punctuation", () => {
   assert.equal(normalizeText("  My Worth, Remains!  "), "my worth remains");
+});
+
+test("prefsSignature is order-independent but changes with preferences", () => {
+  const a = applyDefaults({
+    currentMood: "flat",
+    moodFactors: ["relationships", "self_image"],
+    preferredTopics: ["love", "confidence"],
+    language: "en",
+  });
+  const b = applyDefaults({
+    currentMood: "flat",
+    moodFactors: ["self_image", "relationships"], // reordered
+    preferredTopics: ["confidence", "love"], // reordered
+    language: "en",
+  });
+  const c = applyDefaults({
+    currentMood: "good", // changed
+    moodFactors: ["relationships", "self_image"],
+    preferredTopics: ["love", "confidence"],
+    language: "en",
+  });
+  assert.equal(prefsSignature(a), prefsSignature(b)); // same prefs, any order
+  assert.notEqual(prefsSignature(a), prefsSignature(c)); // mood changed
 });
 
 test("dedupe removes items matching recent normalized texts", () => {
