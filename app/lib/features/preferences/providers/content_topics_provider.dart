@@ -20,6 +20,24 @@ const List<(String, String)> kContentTopics = [
   ('stress', 'Stress & Anxiety'),
 ];
 
+/// Maps a content topic token to an existing feed category id, so the selection
+/// can also filter the seed catalog (the fallback when AI affirmations aren't
+/// loaded, e.g. signed out / offline).
+const Map<String, String> kContentTopicCategory = {
+  'hard_times': 'healing',
+  'workout': 'workout',
+  'productivity': 'productivity',
+  'self_esteem': 'confidence',
+  'success': 'success',
+  'inspiration': 'motivation',
+  'letting_go': 'healing',
+  'love': 'love',
+  'relationships': 'love',
+  'faith': 'faith',
+  'positivity': 'happiness',
+  'stress': 'stress',
+};
+
 /// The user's chosen content topics (persisted in prefs.selectedTopics). These
 /// become the primary `preferredTopics` for affirmation generation, so the
 /// feed adapts to exactly what the user selects here.

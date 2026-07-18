@@ -7,6 +7,7 @@ import '../../../shared/models/quote.dart';
 import '../../affirmations/daily_affirmations_provider.dart';
 import '../../my_quotes/providers/own_quotes_provider.dart';
 import '../../onboarding/providers/onboarding_provider.dart';
+import '../../preferences/providers/content_topics_provider.dart';
 import '../../preferences/providers/settings_providers.dart';
 import '../../premium/providers/premium_provider.dart';
 
@@ -62,6 +63,20 @@ final filteredQuotesProvider = Provider<List<Quote>>((ref) {
   if (mutedCats.isNotEmpty) {
     quotes =
         quotes.where((q) => !mutedCats.contains(q.categoryId)).toList();
+  }
+
+  // Content preferences: restrict the catalog to the chosen topics' categories
+  // (applies to the seed fallback and the AI feed alike). Guarded so it never
+  // empties the feed if nothing matches.
+  final contentCats = ref
+      .watch(contentTopicsProvider)
+      .map((t) => kContentTopicCategory[t])
+      .whereType<String>()
+      .toSet();
+  if (contentCats.isNotEmpty) {
+    final narrowed =
+        quotes.where((q) => contentCats.contains(q.categoryId)).toList();
+    if (narrowed.isNotEmpty) quotes = narrowed;
   }
 
   // Deterministic daily shuffle: same order all day, fresh stack tomorrow.
