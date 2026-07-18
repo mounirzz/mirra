@@ -3,3 +3,4 @@ samconfig.toml
 *.p8
 .mirra_google_secret
 node_modules/
+try_affirmations.mjs

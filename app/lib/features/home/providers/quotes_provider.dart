@@ -4,15 +4,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../data/seed_quotes.dart';
 import '../../../shared/models/quote.dart';
+import '../../affirmations/daily_affirmations_provider.dart';
 import '../../my_quotes/providers/own_quotes_provider.dart';
 import '../../onboarding/providers/onboarding_provider.dart';
 import '../../preferences/providers/settings_providers.dart';
 import '../../premium/providers/premium_provider.dart';
 
-/// The user's own affirmations lead the feed, followed by the seed catalog.
+/// The user's own affirmations lead the feed, followed by the day's catalog.
+/// That catalog is the backend's AI-personalized affirmations once they've
+/// loaded; until then (loading / signed out / offline) it falls back to the
+/// static seed catalog, so the feed is never empty and the UI never changes.
 final allQuotesProvider = Provider<List<Quote>>((ref) {
   final own = ref.watch(ownQuotesProvider);
-  return [...own, ...kSeedQuotes];
+  final ai = ref.watch(dailyAffirmationsProvider);
+  final catalog = ai.isNotEmpty ? ai : kSeedQuotes;
+  return [...own, ...catalog];
 });
 
 /// Categories picked in the Mix screen. Empty set = everything.

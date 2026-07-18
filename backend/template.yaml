@@ -29,6 +29,18 @@ Parameters:
     Type: String
     Default: mirra://auth
     Description: App deep-link the Cognito Hosted UI redirects back to.
+  OpenAiApiKey:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: >
+      OpenAI API key used SERVER-SIDE ONLY to generate affirmations. Never
+      shipped to the app. Leave empty to deploy without AI (the endpoint then
+      returns a graceful fallback).
+  OpenAiModel:
+    Type: String
+    Default: gpt-4o-mini
+    Description: OpenAI chat model used to generate affirmations.
 
 Globals:
   Function:
@@ -40,6 +52,7 @@ Globals:
       Variables:
         BUCKET: !Ref BucketName
         THEMES_TABLE: !Ref ThemesTable
+        AFFIRMATIONS_TABLE: !Ref AffirmationsTable
 
 Resources:
   # ─── Auth: Cognito User Pool + federated Apple/Google ─────────────────────
@@ -117,6 +130,25 @@ Resources:
         - AttributeName: userId
           KeyType: HASH
         - AttributeName: themeId
+          KeyType: RANGE
+
+  # ─── Storage: per-user daily affirmations (AI-generated) ──────────────────
+  # One item per user per local day. `localDate` (YYYY-MM-DD) is the sort key so
+  # the day's set is stable and recent days can be range-queried for dedup.
+  AffirmationsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: mirra-affirmations
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: localDate
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: localDate
           KeyType: RANGE
 
   # ─── API: HTTP API protected by the Cognito JWT authorizer ────────────────
@@ -197,6 +229,28 @@ Resources:
             ApiId: !Ref HttpApi
             Method: DELETE
             Path: /themes/{themeId}
+
+  # AI affirmations — the only function that holds the OpenAI key (scoped here,
+  # not in Globals, to limit its exposure). Longer timeout for the model call.
+  GenerateAffirmationsFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: generateAffirmations.handler
+      CodeUri: src/
+      Timeout: 30
+      Environment:
+        Variables:
+          OPENAI_API_KEY: !Ref OpenAiApiKey
+          OPENAI_MODEL: !Ref OpenAiModel
+      Policies:
+        - DynamoDBCrudPolicy: { TableName: !Ref AffirmationsTable }
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Method: POST
+            Path: /affirmations
 
 Outputs:
   ApiBaseUrl:
