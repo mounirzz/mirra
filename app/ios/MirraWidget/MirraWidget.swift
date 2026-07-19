@@ -1,88 +1,105 @@
-//
-//  MirraWidget.swift
-//  MirraWidget
-//
-//  Created by Ezzahar on 19/07/2026.
-//
-
 import WidgetKit
 import SwiftUI
 
-struct Provider: AppIntentTimelineProvider {
-    func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), configuration: ConfigurationAppIntent())
-    }
+// Must match WidgetService._appGroupId in the Flutter app.
+private let appGroupId = "group.com.mirra.affirmations.shared"
+private let fallbackText = "You are exactly where you need to be."
 
-    func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry {
-        SimpleEntry(date: Date(), configuration: configuration)
-    }
-    
-    func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<SimpleEntry> {
-        var entries: [SimpleEntry] = []
-
-        // Generate a timeline consisting of five entries an hour apart, starting from the current date.
-        let currentDate = Date()
-        for hourOffset in 0 ..< 5 {
-            let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-            let entry = SimpleEntry(date: entryDate, configuration: configuration)
-            entries.append(entry)
-        }
-
-        return Timeline(entries: entries, policy: .atEnd)
-    }
-
-//    func relevances() async -> WidgetRelevances<ConfigurationAppIntent> {
-//        // Generate a list containing the contexts this widget is relevant in.
-//    }
-}
-
-struct SimpleEntry: TimelineEntry {
+struct AffirmationEntry: TimelineEntry {
     let date: Date
-    let configuration: ConfigurationAppIntent
+    let text: String
+    let category: String
 }
 
-struct MirraWidgetEntryView : View {
-    var entry: Provider.Entry
+private func sharedDefaults() -> UserDefaults? { UserDefaults(suiteName: appGroupId) }
+
+private func loadAffirmations() -> [String] {
+    guard let raw = sharedDefaults()?.string(forKey: "affirmations"),
+          let data = raw.data(using: .utf8),
+          let list = try? JSONDecoder().decode([String].self, from: data),
+          !list.isEmpty
+    else { return [] }
+    return list
+}
+
+private func loadCategory() -> String {
+    sharedDefaults()?.string(forKey: "category") ?? "MIRRA"
+}
+
+struct Provider: TimelineProvider {
+    func placeholder(in context: Context) -> AffirmationEntry {
+        AffirmationEntry(date: Date(), text: fallbackText, category: "MIRRA")
+    }
+
+    func getSnapshot(in context: Context, completion: @escaping (AffirmationEntry) -> Void) {
+        let items = loadAffirmations()
+        completion(AffirmationEntry(date: Date(),
+                                    text: items.first ?? fallbackText,
+                                    category: loadCategory()))
+    }
+
+    func getTimeline(in context: Context, completion: @escaping (Timeline<AffirmationEntry>) -> Void) {
+        let items = loadAffirmations()
+        let category = loadCategory()
+        let now = Date()
+        var entries: [AffirmationEntry] = []
+        let count = max(items.count, 1)
+        for i in 0..<count {
+            let date = Calendar.current.date(byAdding: .hour, value: i * 2, to: now) ?? now
+            let text = items.isEmpty ? fallbackText : items[i % items.count]
+            entries.append(AffirmationEntry(date: date, text: text, category: category))
+        }
+        completion(Timeline(entries: entries, policy: .atEnd))
+    }
+}
+
+struct MirraWidgetEntryView: View {
+    @Environment(\.widgetFamily) private var family
+    let entry: AffirmationEntry
 
     var body: some View {
-        VStack {
-            Text("Time:")
-            Text(entry.date, style: .time)
-
-            Text("Favorite Emoji:")
-            Text(entry.configuration.favoriteEmoji)
+        switch family {
+        case .accessoryInline:
+            Text(entry.text)
+        case .accessoryRectangular:
+            VStack(alignment: .leading, spacing: 2) {
+                Text(entry.category.uppercased()).font(.caption2).opacity(0.7)
+                Text(entry.text).font(.caption).lineLimit(3).minimumScaleFactor(0.8)
+            }
+        default:
+            VStack(alignment: .leading, spacing: 8) {
+                Text(entry.category.uppercased())
+                    .font(.caption2).fontWeight(.semibold).opacity(0.65)
+                Text(entry.text)
+                    .font(family == .systemSmall ? .subheadline : .title3)
+                    .fontWeight(.semibold)
+                    .minimumScaleFactor(0.6)
+                    .lineLimit(family == .systemSmall ? 5 : 4)
+                Spacer(minLength: 0)
+                Text("Mirra").font(.caption2).opacity(0.5)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .foregroundStyle(.white)
+            .containerBackground(for: .widget) {
+                LinearGradient(
+                    colors: [Color(red: 0.12, green: 0.14, blue: 0.22),
+                             Color(red: 0.23, green: 0.17, blue: 0.27)],
+                    startPoint: .top, endPoint: .bottom)
+            }
         }
     }
 }
 
 struct MirraWidget: Widget {
-    let kind: String = "MirraWidget"
+    let kind = "MirraWidget"
 
     var body: some WidgetConfiguration {
-        AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
+        StaticConfiguration(kind: kind, provider: Provider()) { entry in
             MirraWidgetEntryView(entry: entry)
-                .containerBackground(.fill.tertiary, for: .widget)
         }
+        .configurationDisplayName("Mirra")
+        .description("Your daily affirmation.")
+        .supportedFamilies([.systemSmall, .systemMedium,
+                            .accessoryRectangular, .accessoryInline])
     }
-}
-
-extension ConfigurationAppIntent {
-    fileprivate static var smiley: ConfigurationAppIntent {
-        let intent = ConfigurationAppIntent()
-        intent.favoriteEmoji = "😀"
-        return intent
-    }
-    
-    fileprivate static var starEyes: ConfigurationAppIntent {
-        let intent = ConfigurationAppIntent()
-        intent.favoriteEmoji = "🤩"
-        return intent
-    }
-}
-
-#Preview(as: .systemSmall) {
-    MirraWidget()
-} timeline: {
-    SimpleEntry(date: .now, configuration: .smiley)
-    SimpleEntry(date: .now, configuration: .starEyes)
 }
