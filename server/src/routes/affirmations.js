@@ -16,6 +16,17 @@ export const affirmationsRouter = Router();
 const OPENAI_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
 
+// USD per 1M tokens [input, output]. Extend as you add models.
+const PRICES = {
+  "gpt-4o-mini": [0.15, 0.6],
+  "gpt-4o": [2.5, 10],
+  "gpt-4.1-mini": [0.4, 1.6],
+};
+const costUsd = (model, promptTokens, completionTokens) => {
+  const [inp, out] = PRICES[model] ?? PRICES["gpt-4o-mini"];
+  return (promptTokens / 1e6) * inp + (completionTokens / 1e6) * out;
+};
+
 const isoDate = (d) => d.toISOString().slice(0, 10);
 const isValidDate = (s) => typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s);
 const daysBefore = (dateStr, n) => {
@@ -46,7 +57,10 @@ async function callOpenAI(userPrompt) {
     throw new Error(`OpenAI ${res.status}: ${body.slice(0, 200)}`);
   }
   const data = await res.json();
-  return JSON.parse(data?.choices?.[0]?.message?.content ?? "{}");
+  return {
+    parsed: JSON.parse(data?.choices?.[0]?.message?.content ?? "{}"),
+    usage: data?.usage ?? { prompt_tokens: 0, completion_tokens: 0 },
+  };
 }
 
 async function mostRecentSaved(uid) {
@@ -104,9 +118,13 @@ affirmationsRouter.post("/", async (req, res) => {
   // 4. Generate (one retry on failure / too many duplicates).
   let best = [];
   let lastError;
+  let promptTokens = 0;
+  let completionTokens = 0;
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      const parsed = await callOpenAI(buildUserPrompt(ctx, avoidTexts));
+      const { parsed, usage } = await callOpenAI(buildUserPrompt(ctx, avoidTexts));
+      promptTokens += usage.prompt_tokens ?? 0;
+      completionTokens += usage.completion_tokens ?? 0;
       const { affirmations } = validateAffirmations(parsed, ctx.count);
       const unique = dedupe(affirmations, normalized);
       if (unique.length > best.length) best = unique;
@@ -117,6 +135,15 @@ affirmationsRouter.post("/", async (req, res) => {
       lastError = e;
       console.error(`affirmations: attempt ${attempt + 1} failed`, e.message);
     }
+  }
+
+  // Record the token usage + estimated cost of this request (fire-and-forget).
+  if (promptTokens || completionTokens) {
+    query(
+      `INSERT INTO ai_usage (user_id, model, prompt_tokens, completion_tokens, cost_usd)
+       VALUES ($1,$2,$3,$4,$5)`,
+      [uid, OPENAI_MODEL, promptTokens, completionTokens, costUsd(OPENAI_MODEL, promptTokens, completionTokens)],
+    ).catch((e) => console.error("ai_usage insert:", e.message));
   }
 
   // 5. Success → replace the day's set atomically.

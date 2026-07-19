@@ -5,6 +5,7 @@ import 'core/i18n/language_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/preferences/preferences_api.dart';
+import 'features/premium/subscription_api.dart';
 import 'features/streak/providers/streak_provider.dart';
 
 class MirraApp extends ConsumerStatefulWidget {
@@ -25,8 +26,9 @@ class _MirraAppState extends ConsumerState<MirraApp> {
   Widget build(BuildContext context) {
     final router = ref.watch(goRouterProvider);
     final language = ref.watch(languageProvider);
-    // Keep the preferences sync alive (pushes prefs to Postgres when signed in).
+    // Keep the sync services alive (push prefs + subscription to Postgres).
     ref.watch(preferencesSyncProvider);
+    ref.watch(subscriptionSyncProvider);
     return MaterialApp.router(
       title: 'Mirra',
       debugShowCheckedModeBanner: false,
