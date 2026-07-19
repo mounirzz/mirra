@@ -7,6 +7,7 @@ import 'core/theme/app_theme.dart';
 import 'features/preferences/preferences_api.dart';
 import 'features/premium/subscription_api.dart';
 import 'features/streak/providers/streak_provider.dart';
+import 'features/widget/widget_service.dart';
 
 class MirraApp extends ConsumerStatefulWidget {
   const MirraApp({super.key});
@@ -26,9 +27,11 @@ class _MirraAppState extends ConsumerState<MirraApp> {
   Widget build(BuildContext context) {
     final router = ref.watch(goRouterProvider);
     final language = ref.watch(languageProvider);
-    // Keep the sync services alive (push prefs + subscription to Postgres).
+    // Keep the sync services alive (push prefs + subscription to Postgres,
+    // and mirror the feed's affirmations to the iOS widget).
     ref.watch(preferencesSyncProvider);
     ref.watch(subscriptionSyncProvider);
+    ref.watch(widgetSyncProvider);
     return MaterialApp.router(
       title: 'Mirra',
       debugShowCheckedModeBanner: false,

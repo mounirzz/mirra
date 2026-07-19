@@ -36,6 +36,9 @@ dependencies:
   crypto: ^3.0.6
   http: ^1.2.2
 
+  # iOS home/lock-screen widgets (shares the daily affirmation via an App Group).
+  home_widget: ^0.7.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
