@@ -5,7 +5,7 @@
 import '../onboarding/providers/onboarding_provider.dart';
 
 // Onboarding option labels → canonical snake_case tokens for the model.
-const _moodFactorTokens = {
+const kMoodFactorTokens = {
   'Work': 'work',
   'Relationships': 'relationships',
   'Self-image': 'self_image',
@@ -13,7 +13,7 @@ const _moodFactorTokens = {
   'Money': 'money',
 };
 
-const _motivationTokens = {
+const kMotivationTokens = {
   'Books': 'books',
   'People': 'people',
   'Music': 'music',
@@ -21,7 +21,7 @@ const _motivationTokens = {
   'Movement': 'movement',
 };
 
-const _improveTopicTokens = {
+const kImproveTopicTokens = {
   'Confidence': 'confidence',
   'Focus': 'focus',
   'Calm': 'calm',
@@ -56,10 +56,10 @@ Map<String, dynamic> buildAffirmationContext({
     return out;
   }
 
-  final moodFactors = tokensFor(answers['feeling_source'], _moodFactorTokens);
+  final moodFactors = tokensFor(answers['feeling_source'], kMoodFactorTokens);
   final motivationSources =
-      tokensFor(answers['motivation_source'], _motivationTokens);
-  final improveTopics = tokensFor(answers['improve'], _improveTopicTokens);
+      tokensFor(answers['motivation_source'], kMotivationTokens);
+  final improveTopics = tokensFor(answers['improve'], kImproveTopicTokens);
 
   final preferredTopics = <String>{...improveTopics, ...extraTopics}.toList();
 

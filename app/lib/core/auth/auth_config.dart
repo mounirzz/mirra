@@ -17,9 +17,10 @@ class AuthConfig {
   static const hostedUiDomain =
       'https://mirra-auth-975050297673.auth.us-east-1.amazoncognito.com';
 
-  /// Base URL of the protected HTTP API (upload-url / themes CRUD).
-  static const apiBaseUrl =
-      'https://fjpayb0sm9.execute-api.us-east-1.amazonaws.com';
+  /// Base URL of the protected API. Now the Railway server (Postgres-backed
+  /// preferences / affirmations / themes); it verifies these same Cognito
+  /// tokens. Endpoint shapes match the old AWS API.
+  static const apiBaseUrl = 'https://mirra-production-6c69.up.railway.app';
 
   /// Deep link the Hosted UI redirects back to (login + logout both registered
   /// on the Cognito app client as `mirra://auth`).
