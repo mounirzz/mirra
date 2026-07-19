@@ -2,7 +2,7 @@ import WidgetKit
 import SwiftUI
 
 // Must match WidgetService._appGroupId in the Flutter app.
-private let appGroupId = "group.com.mirra.affirmations"
+private let appGroupId = "group.com.mirra.affirmations.shared"
 private let fallbackText = "You are exactly where you need to be."
 
 struct AffirmationEntry: TimelineEntry {

@@ -14,7 +14,7 @@ import '../home/providers/quotes_provider.dart';
 class WidgetService {
   const WidgetService._();
 
-  static const _appGroupId = 'group.com.mirra.affirmations';
+  static const _appGroupId = 'group.com.mirra.affirmations.shared';
   static const _iosWidgetName = 'MirraWidget';
 
   static Future<void> init() async {
