@@ -63,6 +63,20 @@ class ContentTopicsNotifier extends StateNotifier<Set<String>> {
       (p) => p.copyWith(selectedTopics: next.toList()),
     );
   }
+
+  /// Follow (or unfollow) a whole bundle of topics at once.
+  Future<void> followBundle(Iterable<String> ids, bool follow) async {
+    final next = {...state};
+    if (follow) {
+      next.addAll(ids);
+    } else {
+      next.removeAll(ids);
+    }
+    state = next;
+    await MirraBoxes.updatePrefs(
+      (p) => p.copyWith(selectedTopics: next.toList()),
+    );
+  }
 }
 
 final contentTopicsProvider =

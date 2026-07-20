@@ -40,6 +40,15 @@ const List<(String, List<(String, String)>)> _sections = [
   ]),
 ];
 
+/// Curated packs — follow a whole set of related topics in one tap.
+const List<(String, String, List<String>)> _bundles = [
+  (
+    'Self-Growth',
+    'Confidence, growth, discipline & fresh starts',
+    ['growth', 'confidence', 'letting_go', 'discipline', 'motivation', 'success'],
+  ),
+];
+
 class FollowTopicsScreen extends ConsumerStatefulWidget {
   const FollowTopicsScreen({super.key});
 
@@ -118,6 +127,7 @@ class _FollowTopicsScreenState extends ConsumerState<FollowTopicsScreen> {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
                 children: [
+                  ..._bundlesSection(followed, q),
                   for (final (title, items) in _sections)
                     ..._section(title, items, followed, q),
                 ],
@@ -125,6 +135,86 @@ class _FollowTopicsScreenState extends ConsumerState<FollowTopicsScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  List<Widget> _bundlesSection(Set<String> followed, String q) {
+    if (q.isNotEmpty) return const []; // hide the shortcut while searching
+    return [
+      Padding(
+        padding: const EdgeInsets.only(top: 4, bottom: 8),
+        child: Text('Bundles', style: MirraType.cochin(size: 17, weight: FontWeight.w800)),
+      ),
+      for (final (name, tagline, tokens) in _bundles)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: _bundleCard(name, tagline, tokens, followed),
+        ),
+      const SizedBox(height: 18),
+    ];
+  }
+
+  Widget _bundleCard(
+    String name,
+    String tagline,
+    List<String> tokens,
+    Set<String> followed,
+  ) {
+    final all = tokens.every(followed.contains);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFEDE7F6), Color(0xFFFBE7DE)],
+        ),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(name, style: MirraType.cochin(size: 17, weight: FontWeight.w800)),
+                const SizedBox(height: 4),
+                Text(tagline,
+                    style: MirraType.cochin(size: 13, color: MirraColors.muted, height: 1.3)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          GestureDetector(
+            onTap: () =>
+                ref.read(contentTopicsProvider.notifier).followBundle(tokens, !all),
+            behavior: HitTestBehavior.opaque,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+              decoration: BoxDecoration(
+                color: all ? MirraColors.ink : Colors.white,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: all ? MirraColors.ink : const Color(0xFFDBD8E3)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (all) ...[
+                    const Icon(Icons.check_rounded, size: 14, color: Colors.white),
+                    const SizedBox(width: 4),
+                  ],
+                  Text(all ? 'Following' : 'Follow all',
+                      style: MirraType.cochin(
+                          size: 13,
+                          weight: FontWeight.w700,
+                          color: all ? Colors.white : MirraColors.ink)),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
