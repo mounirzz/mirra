@@ -4,6 +4,7 @@ import { requireAuth } from "./auth.js";
 import { touchUser } from "./geo.js";
 import { migrate } from "./migrate.js";
 import { affirmationsRouter } from "./routes/affirmations.js";
+import { engagementRouter } from "./routes/engagement.js";
 import { preferencesRouter } from "./routes/preferences.js";
 import { subscriptionRouter } from "./routes/subscription.js";
 import { themesRouter } from "./routes/themes.js";
@@ -22,6 +23,7 @@ app.use("/preferences", auth, preferencesRouter);
 app.use("/affirmations", auth, affirmationsRouter);
 app.use("/themes", auth, themesRouter);
 app.use("/subscription", auth, subscriptionRouter);
+app.use("/engagement", auth, engagementRouter);
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, _req, res, _next) => {

@@ -115,6 +115,30 @@ affirmationsRouter.post("/", async (req, res) => {
   let avoidTexts = recent.rows.map((r) => r.text).slice(-60);
   let normalized = recent.rows.map((r) => normalizeText(r.text));
 
+  // What the user liked / shared / copied — fed back as style examples, and
+  // their topics boosted, so the model leans into what resonated. (Computed
+  // after the prefs signature, so it shapes the next generation, not a same-day
+  // cache invalidation.)
+  let loved = [];
+  try {
+    const r = await query(
+      `SELECT text, topic FROM engagement
+        WHERE user_id = $1 AND action IN ('like','share','copy')
+          AND text IS NOT NULL AND text <> ''
+        ORDER BY (CASE action WHEN 'copy' THEN 3 WHEN 'share' THEN 3 ELSE 2 END) DESC,
+                 created_at DESC
+        LIMIT 12`,
+      [uid],
+    );
+    loved = r.rows.map((x) => x.text);
+    const lovedTopics = [...new Set(r.rows.map((x) => x.topic).filter(Boolean))];
+    if (lovedTopics.length) {
+      ctx.preferredTopics = [...new Set([...lovedTopics, ...ctx.preferredTopics])];
+    }
+  } catch (e) {
+    console.error("affirmations: loved query failed", e.message);
+  }
+
   // 4. Generate (one retry on failure / too many duplicates).
   let best = [];
   let lastError;
@@ -122,7 +146,7 @@ affirmationsRouter.post("/", async (req, res) => {
   let completionTokens = 0;
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      const { parsed, usage } = await callOpenAI(buildUserPrompt(ctx, avoidTexts));
+      const { parsed, usage } = await callOpenAI(buildUserPrompt(ctx, avoidTexts, loved));
       promptTokens += usage.prompt_tokens ?? 0;
       completionTokens += usage.completion_tokens ?? 0;
       const { affirmations } = validateAffirmations(parsed, ctx.count);

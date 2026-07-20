@@ -100,8 +100,37 @@ export function applyDefaults(raw = {}) {
 
 const languageName = (code) => LANGUAGE_NAMES[code] || code || "English";
 
-/** Builds the dynamic user prompt from a sanitized context (+ texts to avoid). */
-export function buildUserPrompt(ctx, avoid = []) {
+// Flame levels (gamification). Points → level index + name.
+const FLAME_LEVELS = [
+  { min: 0, name: "Spark" },
+  { min: 50, name: "Ember" },
+  { min: 200, name: "Glow" },
+  { min: 500, name: "Blaze" },
+  { min: 1000, name: "Radiance" },
+  { min: 2500, name: "Luminary" },
+];
+
+/** Maps a flame-point total to { level, name, points, nextAt, nextName }. */
+export function flameLevel(points) {
+  const p = Number(points) || 0;
+  let idx = 0;
+  for (let i = 0; i < FLAME_LEVELS.length; i++) if (p >= FLAME_LEVELS[i].min) idx = i;
+  const next = FLAME_LEVELS[idx + 1] ?? null;
+  return {
+    points: p,
+    level: idx + 1,
+    name: FLAME_LEVELS[idx].name,
+    nextAt: next?.min ?? null,
+    nextName: next?.name ?? null,
+  };
+}
+
+/**
+ * Builds the dynamic user prompt from a sanitized context. [avoid] = recent
+ * texts to not repeat; [loved] = affirmations the user liked/shared/copied, fed
+ * back so the model leans into what resonated (writing fresh ones).
+ */
+export function buildUserPrompt(ctx, avoid = [], loved = []) {
   const topics = ctx.preferredTopics.map(pretty).join(", ");
   const lines = [
     `Generate ${ctx.count} personalized affirmations.`,
@@ -131,6 +160,16 @@ export function buildUserPrompt(ctx, avoid = []) {
       ...avoid.slice(0, 60).map((t) => `- ${t}`),
     );
   }
+
+  if (loved.length) {
+    lines.push(
+      "",
+      "The user especially connected with these affirmations — lean into their",
+      "themes and tone, but write fresh, non-repeating ones:",
+      ...loved.slice(0, 12).map((t) => `- ${t}`),
+    );
+  }
+
   lines.push(
     "",
     "Return only the required JSON — an object with this exact shape:",
