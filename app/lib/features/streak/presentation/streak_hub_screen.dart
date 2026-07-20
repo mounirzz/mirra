@@ -217,6 +217,7 @@ class StreakHubScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
                         child: _CustomizeCard(
@@ -226,7 +227,13 @@ class StreakHubScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Expanded(child: SizedBox()),
+                      Expanded(
+                        child: _CustomizeCard(
+                          label: ref.tr('Self-Growth'),
+                          emoji: '🌱',
+                          onTap: () => context.push('/topics'),
+                        ),
+                      ),
                     ],
                   ),
                 ],
