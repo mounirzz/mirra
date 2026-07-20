@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/i18n/language_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'features/flames/flame_api.dart';
 import 'features/preferences/preferences_api.dart';
 import 'features/premium/subscription_api.dart';
 import 'features/streak/providers/streak_provider.dart';
@@ -32,6 +33,7 @@ class _MirraAppState extends ConsumerState<MirraApp> {
     ref.watch(preferencesSyncProvider);
     ref.watch(subscriptionSyncProvider);
     ref.watch(widgetSyncProvider);
+    ref.watch(flameProvider);
     return MaterialApp.router(
       title: 'Mirra',
       debugShowCheckedModeBanner: false,

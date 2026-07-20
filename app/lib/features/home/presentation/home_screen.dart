@@ -22,6 +22,7 @@ import '../../../shared/widgets/primary_button.dart';
 import '../../../shared/widgets/glass.dart';
 import '../../../shared/widgets/tap_icon.dart';
 import '../../favorites/providers/favorites_provider.dart';
+import '../../flames/flame_api.dart';
 import '../../premium/providers/premium_provider.dart';
 import '../../premium/upsell_sheet.dart';
 import '../../share/share_card.dart';
@@ -336,12 +337,22 @@ class _QuoteCardState extends ConsumerState<_QuoteCard>
   Quote get quote => widget.quote;
   bool get isFavorite => widget.isFavorite;
 
+  /// Records an engagement (earns flames + teaches the model what resonated).
+  void _engage(String action) {
+    ref.read(flameProvider.notifier).record(
+          action,
+          text: quote.text,
+          topic: quote.categoryId,
+        );
+  }
+
   Future<void> _onDoubleTap() async {
     HapticFeedback.mediumImpact();
     // Instagram rule: double-tap always likes, never unlikes.
     if (!isFavorite) {
       final added = await widget.onFavorite();
       if (!added) return; // blocked → upsell is showing, skip the heart
+      _engage('like');
     }
     _heartController.forward(from: 0);
   }
@@ -374,11 +385,13 @@ class _QuoteCardState extends ConsumerState<_QuoteCard>
     await Share.shareXFiles([
       XFile(file.path, mimeType: 'image/png'),
     ], sharePositionOrigin: origin);
+    _engage('share');
   }
 
   void _copyQuote(BuildContext context) {
     HapticFeedback.lightImpact();
     Clipboard.setData(ClipboardData(text: '${quote.text}\n— ${quote.author}'));
+    _engage('copy');
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
@@ -488,9 +501,11 @@ class _QuoteCardState extends ConsumerState<_QuoteCard>
                         semanticLabel: isFavorite
                             ? 'Remove from favorites'
                             : 'Add to favorites',
-                        onTap: () {
+                        onTap: () async {
                           HapticFeedback.lightImpact();
-                          widget.onFavorite();
+                          final wasFavorite = isFavorite;
+                          final added = await widget.onFavorite();
+                          if (added && !wasFavorite) _engage('like');
                         },
                       ),
                       const SizedBox(height: 12),
@@ -709,6 +724,10 @@ class _StreakBadgeState extends ConsumerState<_StreakBadge>
   @override
   Widget build(BuildContext context) {
     final streak = ref.watch(streakProvider).count;
+    // Once the user has flame points (signed in + engaging), the badge shows
+    // those; otherwise it falls back to the day streak.
+    final flames = ref.watch(flameProvider).points;
+    final display = flames > 0 ? flames : streak;
     final theme = ref.watch(appThemeProvider);
     final fg = theme.dark ? Colors.white : MirraColors.ink;
 
@@ -733,7 +752,7 @@ class _StreakBadgeState extends ConsumerState<_StreakBadge>
             ),
             const SizedBox(width: 5),
             Text(
-              '$streak',
+              '$display',
               style: MirraType.cochin(
                 size: 13,
                 weight: FontWeight.w700,
