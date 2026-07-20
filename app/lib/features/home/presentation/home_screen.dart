@@ -24,6 +24,7 @@ import '../../../shared/widgets/tap_icon.dart';
 import '../../favorites/providers/favorites_provider.dart';
 import '../../flames/flame_api.dart';
 import '../../premium/providers/premium_provider.dart';
+import '../../voice/voice_service.dart';
 import '../../premium/upsell_sheet.dart';
 import '../../share/share_card.dart';
 import '../../streak/providers/streak_provider.dart';
@@ -337,6 +338,12 @@ class _QuoteCardState extends ConsumerState<_QuoteCard>
   Quote get quote => widget.quote;
   bool get isFavorite => widget.isFavorite;
 
+  /// Reads the current affirmation aloud with the selected voice.
+  void _speak() {
+    HapticFeedback.lightImpact();
+    ref.read(voiceServiceProvider).speak(quote.text);
+  }
+
   /// Records an engagement (earns flames + teaches the model what resonated).
   void _engage(String action) {
     ref.read(flameProvider.notifier).record(
@@ -491,6 +498,13 @@ class _QuoteCardState extends ConsumerState<_QuoteCard>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      _CircleAction(
+                        icon: Icons.volume_up_rounded,
+                        iconColor: navFg,
+                        semanticLabel: 'Read aloud',
+                        onTap: _speak,
+                      ),
+                      const SizedBox(height: 12),
                       _CircleAction(
                         icon: isFavorite
                             ? Icons.favorite

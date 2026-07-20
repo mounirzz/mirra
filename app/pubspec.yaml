@@ -40,6 +40,9 @@ dependencies:
   home_widget: ^0.7.0
   flutter_dynamic_icon_plus: ^1.4.0
 
+  # Read affirmations aloud with a selectable voice.
+  flutter_tts: ^4.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

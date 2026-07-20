@@ -85,6 +85,16 @@ class PreferencesScreen extends ConsumerWidget {
                     onTap: () => context.push('/preferences/sound'),
                   ),
                   SettingsRow(
+                    icon: Icons.record_voice_over_outlined,
+                    label: ref.tr('Voice'),
+                    onTap: () => context.push('/preferences/voice'),
+                  ),
+                  SettingsRow(
+                    icon: Icons.mic_none_rounded,
+                    label: ref.tr('Siri'),
+                    onTap: () => context.push('/siri'),
+                  ),
+                  SettingsRow(
                     icon: Icons.notifications_none_rounded,
                     label: ref.tr('Reminders'),
                     onTap: () => context.push('/preferences/reminders'),

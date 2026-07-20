@@ -15,6 +15,8 @@ import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/settings/presentation/app_icon_screen.dart';
 import '../../features/settings/presentation/widgets_guide_screen.dart';
 import '../../features/topics/presentation/follow_topics_screen.dart';
+import '../../features/voice/presentation/voice_screen.dart';
+import '../../features/siri/presentation/siri_screen.dart';
 import '../../features/streak/presentation/streak_hub_screen.dart';
 import '../../features/theme/presentation/create_theme_screen.dart';
 import '../../features/theme/presentation/theme_mixes_screen.dart';
@@ -105,6 +107,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/preferences/reminders',
         builder: (context, state) => const RemindersScreen(),
+      ),
+      GoRoute(
+        path: '/preferences/voice',
+        builder: (context, state) => const VoiceScreen(),
+      ),
+      GoRoute(
+        path: '/siri',
+        builder: (context, state) => const SiriScreen(),
       ),
       GoRoute(
         path: '/paywall',
