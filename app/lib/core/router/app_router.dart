@@ -12,6 +12,9 @@ import '../../features/preferences/presentation/preferences_screen.dart';
 import '../../features/preferences/presentation/preferences_subscreens.dart';
 import '../../features/premium/presentation/paywall_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
+import '../../features/settings/presentation/app_icon_screen.dart';
+import '../../features/settings/presentation/widgets_guide_screen.dart';
+import '../../features/topics/presentation/follow_topics_screen.dart';
 import '../../features/streak/presentation/streak_hub_screen.dart';
 import '../../features/theme/presentation/create_theme_screen.dart';
 import '../../features/theme/presentation/theme_mixes_screen.dart';
@@ -54,6 +57,18 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/profile',
         builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/topics',
+        builder: (context, state) => const FollowTopicsScreen(),
+      ),
+      GoRoute(
+        path: '/app-icon',
+        builder: (context, state) => const AppIconScreen(),
+      ),
+      GoRoute(
+        path: '/widgets',
+        builder: (context, state) => const WidgetsGuideScreen(),
       ),
       GoRoute(
         path: '/preferences',

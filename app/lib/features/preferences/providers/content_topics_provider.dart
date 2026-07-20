@@ -36,6 +36,17 @@ const Map<String, String> kContentTopicCategory = {
   'faith': 'faith',
   'positivity': 'happiness',
   'stress': 'stress',
+  // Extra tokens used by the "Topics you follow" screen.
+  'confidence': 'confidence',
+  'motivation': 'motivation',
+  'gratitude': 'gratitude',
+  'happiness': 'happiness',
+  'discipline': 'motivation',
+  'calm': 'stress',
+  'mindfulness': 'mindfulness',
+  'healing': 'healing',
+  'health': 'happiness',
+  'growth': 'life',
 };
 
 /// The user's chosen content topics (persisted in prefs.selectedTopics). These

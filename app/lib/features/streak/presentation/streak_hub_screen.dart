@@ -181,7 +181,7 @@ class StreakHubScreen extends ConsumerWidget {
                         child: _CustomizeCard(
                           label: ref.tr('Topics you follow'),
                           emoji: '🗂️',
-                          onTap: () => context.push('/mix'),
+                          onTap: () => context.push('/topics'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -189,7 +189,7 @@ class StreakHubScreen extends ConsumerWidget {
                         child: _CustomizeCard(
                           label: ref.tr('Reminders'),
                           emoji: '🔔',
-                          onTap: () => context.push('/preferences'),
+                          onTap: () => context.push('/preferences/reminders'),
                         ),
                       ),
                     ],
@@ -208,11 +208,25 @@ class StreakHubScreen extends ConsumerWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _CustomizeCard(
-                          label: 'Mirra+',
-                          emoji: '👑',
-                          onTap: () => context.push('/paywall'),
+                          label: ref.tr('App icon'),
+                          emoji: '📱',
+                          onTap: () => context.push('/app-icon'),
                         ),
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _CustomizeCard(
+                          label: ref.tr('Widgets'),
+                          emoji: '🧩',
+                          onTap: () => context.push('/widgets'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(child: SizedBox()),
                     ],
                   ),
                 ],
