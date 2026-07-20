@@ -66,7 +66,7 @@ class _AppIconScreenState extends State<AppIconScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             GestureDetector(
-              onTap: () => context.pop(),
+              onTap: () => context.canPop() ? context.pop() : context.go('/home'),
               behavior: HitTestBehavior.opaque,
               child: const Padding(
                 padding: EdgeInsets.fromLTRB(20, 12, 20, 8),

@@ -66,7 +66,7 @@ class _FollowTopicsScreenState extends ConsumerState<FollowTopicsScreen> {
               child: Row(
                 children: [
                   GestureDetector(
-                    onTap: () => context.pop(),
+                    onTap: () => context.canPop() ? context.pop() : context.go('/home'),
                     behavior: HitTestBehavior.opaque,
                     child: const Padding(
                       padding: EdgeInsets.all(8),

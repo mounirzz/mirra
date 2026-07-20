@@ -21,7 +21,7 @@ class WidgetsGuideScreen extends StatelessWidget {
             Align(
               alignment: Alignment.centerLeft,
               child: GestureDetector(
-                onTap: () => context.pop(),
+                onTap: () => context.canPop() ? context.pop() : context.go('/home'),
                 behavior: HitTestBehavior.opaque,
                 child: const Padding(
                   padding: EdgeInsets.fromLTRB(16, 10, 16, 6),
@@ -55,7 +55,7 @@ class WidgetsGuideScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
               child: GestureDetector(
-                onTap: () => context.pop(),
+                onTap: () => context.canPop() ? context.pop() : context.go('/home'),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
                   height: 56,
