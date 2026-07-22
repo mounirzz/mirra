@@ -127,6 +127,10 @@ const Map<String, String> _fr = {
   'Welcome to Mirra': 'Bienvenue sur Mirra',
   'Reflect daily. Reshape gently.':
       'Réfléchissez chaque jour. Transformez-vous en douceur.',
+  'Stay motivated with a\nconsistent daily routine':
+      'Restez motivé grâce à une\nroutine quotidienne régulière',
+  'Build a streak, one day at a time':
+      'Construisez votre série, un jour à la fois',
   'Add your affirmation': 'Ajouter votre affirmation',
   'Write your own affirmations —\nwhat you tell yourself matters most.':
       'Écrivez vos propres affirmations —\nce que vous vous dites compte le '

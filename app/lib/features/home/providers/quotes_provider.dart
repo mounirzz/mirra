@@ -26,9 +26,9 @@ const _improveBoosts = <String, List<String>>{
   'Discipline': ['motivation', 'workout'],
 };
 
-/// Free-plan daily stack: 5 affirmations, then the end card sells Mirra+.
+/// Free-plan daily stack: 3 affirmations, then the end card sells Mirra+.
 /// The batch rotates every day, so "come back tomorrow" is a real promise.
-const _dailyBatchSize = 5;
+const _dailyBatchSize = 3;
 
 final filteredQuotesProvider = Provider<List<Quote>>((ref) {
   final all = ref.watch(allQuotesProvider);

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/colors.dart';
 import '../../../core/theme/typography.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../../onboarding/providers/onboarding_provider.dart';
 import '../providers/premium_provider.dart';
 
 /// Full-screen Mirra+ paywall, framed as a 3-day free trial with a clear
@@ -26,6 +27,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
 
   void _close() {
     if (widget.fromOnboarding) {
+      // Onboarding is truly done here. Flipping this rebuilds the router
+      // with initialLocation '/home', landing the user on the feed.
+      ref.read(onboardingCompleteProvider.notifier).state = true;
       context.go('/home');
     } else {
       context.pop();
