@@ -13,6 +13,7 @@ import '../../../shared/widgets/tap_icon.dart';
 import '../providers/onboarding_provider.dart';
 import 'answer_chips.dart';
 import 'onboarding_questions.dart';
+import 'streak_intro_screen.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -24,29 +25,40 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   int _index = 0;
 
+  /// Shown inline right before the reminder-frequency question.
+  bool _showStreakIntro = false;
+
   OnbQuestion get _q => kOnboardingQuestions[_index];
 
   double get _progress => (_index + 1) / kOnboardingQuestions.length;
 
   void _next() async {
-    // Peak-intent moment for the iOS notification prompt: the user just
-    // picked when they want their reminders.
+    final isLast = _index == kOnboardingQuestions.length - 1;
+
+    // Just answered the reminder-time question → show the streak intro
+    // before the "how many reminders" question that follows it.
     if (_q.id == 'time') {
-      await NotificationService.requestPermission();
+      setState(() => _showStreakIntro = true);
+      return;
     }
-    if (_index < kOnboardingQuestions.length - 1) {
+
+    if (!isLast) {
       setState(() => _index += 1);
     } else {
+      // Frequency answered = peak intent for the notification prompt.
+      await NotificationService.requestPermission();
+      // Persist answers, but DON'T flip onboardingComplete yet: doing so
+      // rebuilds the router (initialLocation → /home) and would skip the
+      // paywall. The flag is set when leaving the paywall.
       await ref.read(onboardingProvider.notifier).persist();
-      ref.read(onboardingCompleteProvider.notifier).state = true;
-      // One skippable paywall right after onboarding — the single
-      // highest-converting placement in this category.
       if (mounted) context.go('/paywall?from=onboarding');
     }
   }
 
   void _back() {
-    if (_index > 0) {
+    if (_showStreakIntro) {
+      setState(() => _showStreakIntro = false);
+    } else if (_index > 0) {
       setState(() => _index -= 1);
     } else {
       context.go('/');
@@ -55,6 +67,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_showStreakIntro) {
+      return StreakIntroScreen(
+        onBack: _back,
+        onContinue: () => setState(() {
+          _showStreakIntro = false;
+          _index += 1; // advance to the reminder-frequency question
+        }),
+      );
+    }
+
     final answers = ref.watch(onboardingProvider);
     final selected = answers[_q.id];
     final isLast = _index == kOnboardingQuestions.length - 1;
