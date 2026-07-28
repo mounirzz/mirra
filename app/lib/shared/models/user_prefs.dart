@@ -19,6 +19,7 @@ class UserPrefs {
     this.mutedCategories = const [],
     this.premiumPlan,
     this.premiumSince,
+    this.flamePoints = 0,
   });
 
   bool onboardingComplete;
@@ -57,6 +58,10 @@ class UserPrefs {
   String? premiumPlan;
   String? premiumSince;
 
+  /// Local "interactive flame" total — grows on every like/share/copy, works
+  /// offline (independent of the server-backed engagement level).
+  int flamePoints;
+
   UserPrefs copyWith({
     bool? onboardingComplete,
     Map<String, String>? answers,
@@ -75,6 +80,7 @@ class UserPrefs {
     List<String>? mutedCategories,
     String? premiumPlan,
     String? premiumSince,
+    int? flamePoints,
   }) {
     return UserPrefs(
       onboardingComplete: onboardingComplete ?? this.onboardingComplete,
@@ -94,6 +100,7 @@ class UserPrefs {
       mutedCategories: mutedCategories ?? this.mutedCategories,
       premiumPlan: premiumPlan ?? this.premiumPlan,
       premiumSince: premiumSince ?? this.premiumSince,
+      flamePoints: flamePoints ?? this.flamePoints,
     );
   }
 }
@@ -126,13 +133,14 @@ class UserPrefsAdapter extends TypeAdapter<UserPrefs> {
       mutedCategories: (fields[14] as List?)?.cast<String>() ?? const [],
       premiumPlan: fields[15] as String?,
       premiumSince: fields[16] as String?,
+      flamePoints: fields[17] as int? ?? 0,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserPrefs obj) {
     writer
-      ..writeByte(17)
+      ..writeByte(18)
       ..writeByte(0)
       ..write(obj.onboardingComplete)
       ..writeByte(1)
@@ -166,6 +174,8 @@ class UserPrefsAdapter extends TypeAdapter<UserPrefs> {
       ..writeByte(15)
       ..write(obj.premiumPlan)
       ..writeByte(16)
-      ..write(obj.premiumSince);
+      ..write(obj.premiumSince)
+      ..writeByte(17)
+      ..write(obj.flamePoints);
   }
 }

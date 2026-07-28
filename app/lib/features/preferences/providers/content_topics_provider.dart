@@ -55,28 +55,48 @@ const Map<String, String> kContentTopicCategory = {
 class ContentTopicsNotifier extends StateNotifier<Set<String>> {
   ContentTopicsNotifier() : super({...MirraBoxes.current.selectedTopics});
 
-  Future<void> toggle(String id) async {
+  /// Free-plan cap on how many categories can be selected; going past it is
+  /// the Mirra+ upsell moment.
+  static const freeLimit = 2;
+
+  /// Toggles a topic. Returns false when the add was blocked by the free-plan
+  /// limit, so the caller can show the upsell. Removing is always allowed.
+  Future<bool> toggle(String id) async {
     final next = {...state};
-    if (!next.remove(id)) next.add(id);
+    if (next.remove(id)) {
+      state = next;
+      await _persist(next);
+      return true;
+    }
+    if (!MirraBoxes.current.isPremium && state.length >= freeLimit) {
+      return false;
+    }
+    next.add(id);
     state = next;
-    await MirraBoxes.updatePrefs(
-      (p) => p.copyWith(selectedTopics: next.toList()),
-    );
+    await _persist(next);
+    return true;
   }
 
-  /// Follow (or unfollow) a whole bundle of topics at once.
+  /// Follow (or unfollow) a whole bundle of topics at once. On the free plan,
+  /// adding stops once the [freeLimit] is reached.
   Future<void> followBundle(Iterable<String> ids, bool follow) async {
     final next = {...state};
     if (follow) {
-      next.addAll(ids);
+      final premium = MirraBoxes.current.isPremium;
+      for (final id in ids) {
+        if (!premium && next.length >= freeLimit) break;
+        next.add(id);
+      }
     } else {
       next.removeAll(ids);
     }
     state = next;
-    await MirraBoxes.updatePrefs(
-      (p) => p.copyWith(selectedTopics: next.toList()),
-    );
+    await _persist(next);
   }
+
+  Future<void> _persist(Set<String> next) => MirraBoxes.updatePrefs(
+        (p) => p.copyWith(selectedTopics: next.toList()),
+      );
 }
 
 final contentTopicsProvider =

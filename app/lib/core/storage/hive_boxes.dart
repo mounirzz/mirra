@@ -20,8 +20,14 @@ class MirraBoxes {
 
   static Future<void> init() async {
     await Hive.initFlutter();
-    Hive.registerAdapter(QuoteAdapter());
-    Hive.registerAdapter(UserPrefsAdapter());
+    // Idempotent: safe to call more than once (e.g. an integration test that
+    // seeds prefs before app startup calls init() again).
+    if (!Hive.isAdapterRegistered(QuoteAdapter().typeId)) {
+      Hive.registerAdapter(QuoteAdapter());
+    }
+    if (!Hive.isAdapterRegistered(UserPrefsAdapter().typeId)) {
+      Hive.registerAdapter(UserPrefsAdapter());
+    }
 
     favorites = await Hive.openBox<String>(favoritesBoxName);
     ownQuotes = await Hive.openBox<Quote>(ownQuotesBoxName);

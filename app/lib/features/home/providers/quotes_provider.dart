@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/storage/hive_boxes.dart';
 import '../../../data/seed_quotes.dart';
 import '../../../shared/models/quote.dart';
 import '../../affirmations/daily_affirmations_provider.dart';
@@ -22,8 +23,38 @@ final allQuotesProvider = Provider<List<Quote>>((ref) {
   return [...own, ...catalog];
 });
 
-/// Categories picked in the Mix screen. Empty set = everything.
-final selectedCategoriesProvider = StateProvider<Set<String>>((ref) => {});
+/// Categories picked in the Mix / Content preferences screens (both share this
+/// one selection — pick in one, it reflects in the other and shapes the feed).
+/// Empty set = everything.
+class SelectedCategoriesNotifier extends StateNotifier<Set<String>> {
+  SelectedCategoriesNotifier() : super({});
+
+  /// Free-plan cap on how many categories can be selected at once.
+  static const freeLimit = 2;
+
+  /// Toggles a category. Returns false when the add was blocked by the
+  /// free-plan limit, so the caller can show the upsell. Removing is allowed.
+  bool toggle(String categoryId) {
+    final next = {...state};
+    if (next.remove(categoryId)) {
+      state = next;
+      return true;
+    }
+    if (!MirraBoxes.current.isPremium && state.length >= freeLimit) {
+      return false;
+    }
+    next.add(categoryId);
+    state = next;
+    return true;
+  }
+
+  void clear() => state = {};
+}
+
+final selectedCategoriesProvider =
+    StateNotifierProvider<SelectedCategoriesNotifier, Set<String>>(
+  (ref) => SelectedCategoriesNotifier(),
+);
 
 /// Which categories to surface first, from the onboarding answers.
 const _improveBoosts = <String, List<String>>{
@@ -42,10 +73,16 @@ final filteredQuotesProvider = Provider<List<Quote>>((ref) {
   final cats = ref.watch(selectedCategoriesProvider);
   final answers = ref.watch(onboardingProvider);
 
-  // An explicit Mix selection wins over everything else and shows the full
-  // matching catalog (the user is deliberately exploring).
+  // An explicit category selection (Mix / Content preferences) wins over
+  // everything else. Free users still get only the daily batch; Mirra+ is
+  // unlimited.
   if (cats.isNotEmpty) {
-    return all.where((q) => cats.contains(q.categoryId)).toList();
+    final own = all.where((q) => q.categoryId == 'personal').toList();
+    final matching = all
+        .where((q) => q.categoryId != 'personal' && cats.contains(q.categoryId))
+        .toList();
+    final isPremium = ref.watch(isPremiumProvider);
+    return [...own, ...(isPremium ? matching : matching.take(_dailyBatchSize))];
   }
 
   // The user's own affirmations always lead and don't count in the batch.

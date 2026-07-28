@@ -65,3 +65,60 @@ class StreakNotifier extends StateNotifier<StreakState> {
 final streakProvider = StateNotifierProvider<StreakNotifier, StreakState>(
   (ref) => StreakNotifier(),
 );
+
+/// Local, offline "interactive flame" total. Every like/share/copy bumps it up
+/// instantly and persists it, so the 🔥 badge grows as the user engages —
+/// independent of sign-in or the server-backed engagement level.
+class LocalFlamesState {
+  const LocalFlamesState({required this.count, required this.lastDelta});
+
+  final int count;
+
+  /// The size of the most recent bump (for a one-shot "+N" flourish). 0 when
+  /// nothing just happened.
+  final int lastDelta;
+}
+
+class LocalFlamesNotifier extends StateNotifier<LocalFlamesState> {
+  LocalFlamesNotifier()
+      : super(
+          LocalFlamesState(
+            count: MirraBoxes.current.flamePoints,
+            lastDelta: 0,
+          ),
+        );
+
+  /// Points awarded per engagement action.
+  static int pointsFor(String action) {
+    switch (action) {
+      case 'like':
+        return 1;
+      case 'share':
+        return 2; // sharing spreads Mirra → worth a little more
+      case 'copy':
+        return 1;
+      default:
+        return 0;
+    }
+  }
+
+  Future<void> bump(String action) async {
+    final delta = pointsFor(action);
+    if (delta == 0) return;
+    final next = state.count + delta;
+    await MirraBoxes.updatePrefs((p) => p.copyWith(flamePoints: next));
+    state = LocalFlamesState(count: next, lastDelta: delta);
+  }
+
+  /// Clears the one-shot delta after the UI has played its flourish.
+  void clearDelta() {
+    if (state.lastDelta != 0) {
+      state = LocalFlamesState(count: state.count, lastDelta: 0);
+    }
+  }
+}
+
+final localFlamesProvider =
+    StateNotifierProvider<LocalFlamesNotifier, LocalFlamesState>(
+  (ref) => LocalFlamesNotifier(),
+);

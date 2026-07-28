@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/i18n/strings.dart';
 import '../../../core/theme/colors.dart';
 import '../../../core/theme/typography.dart';
+import '../../../shared/upsell.dart';
 import '../../preferences/providers/content_topics_provider.dart';
 
 /// Topics the user can follow. Each maps to a token that drives the feed and
@@ -262,7 +264,17 @@ class _FollowTopicsScreenState extends ConsumerState<FollowTopicsScreen> {
                 style: MirraType.cochin(size: 15, weight: FontWeight.w700)),
           ),
           GestureDetector(
-            onTap: () => ref.read(contentTopicsProvider.notifier).toggle(token),
+            onTap: () async {
+              final ok =
+                  await ref.read(contentTopicsProvider.notifier).toggle(token);
+              if (!ok && mounted) {
+                showFreeLimitUpsell(
+                  context,
+                  ref,
+                  ref.tr('Free plan: up to 2 categories.'),
+                );
+              }
+            },
             behavior: HitTestBehavior.opaque,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 150),

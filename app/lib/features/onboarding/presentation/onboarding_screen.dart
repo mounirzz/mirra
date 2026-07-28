@@ -12,6 +12,7 @@ import '../../../shared/widgets/primary_button.dart';
 import '../../../shared/widgets/tap_icon.dart';
 import '../providers/onboarding_provider.dart';
 import 'answer_chips.dart';
+import 'app_icon_picker_screen.dart';
 import 'onboarding_questions.dart';
 import 'streak_intro_screen.dart';
 
@@ -27,6 +28,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   /// Shown inline right before the reminder-frequency question.
   bool _showStreakIntro = false;
+
+  /// The app-icon picker, shown right after the streak intro.
+  bool _showIconPicker = false;
 
   OnbQuestion get _q => kOnboardingQuestions[_index];
 
@@ -56,7 +60,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   void _back() {
-    if (_showStreakIntro) {
+    if (_showIconPicker) {
+      // Back from the icon picker returns to the streak intro.
+      setState(() {
+        _showIconPicker = false;
+        _showStreakIntro = true;
+      });
+    } else if (_showStreakIntro) {
       setState(() => _showStreakIntro = false);
     } else if (_index > 0) {
       setState(() => _index -= 1);
@@ -70,8 +80,19 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     if (_showStreakIntro) {
       return StreakIntroScreen(
         onBack: _back,
+        // Streak → icon picker (still before the frequency question).
         onContinue: () => setState(() {
           _showStreakIntro = false;
+          _showIconPicker = true;
+        }),
+      );
+    }
+
+    if (_showIconPicker) {
+      return AppIconPickerScreen(
+        onBack: _back,
+        onContinue: () => setState(() {
+          _showIconPicker = false;
           _index += 1; // advance to the reminder-frequency question
         }),
       );

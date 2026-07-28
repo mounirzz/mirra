@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
+import 'package:mirra/core/storage/hive_boxes.dart';
 import 'package:mirra/main.dart' as app;
 
 /// The feed has infinite animations (flame badge, swipe hint), so
@@ -48,6 +49,15 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('streak hub and preferences all work', (tester) async {
+    // Land straight on the feed: onboarding runs native iOS dialogs
+    // (notification permission, app-icon change alert) that a widget test
+    // cannot dismiss. Seeding it complete keeps this test focused on the hub
+    // and Preferences flows it's meant to verify.
+    await MirraBoxes.init();
+    await MirraBoxes.updatePrefs(
+      (p) => p.copyWith(onboardingComplete: true, seenSwipeHint: true),
+    );
+
     await app.main();
     await settle(tester);
     await tester.pump(const Duration(seconds: 3)); // streak celebration
@@ -99,13 +109,10 @@ void main() {
     await openAndReturn(tester, 'My favorites', 'avorites');
     await openAndReturn(tester, 'My own quotes', 'affirmation');
     await openAndReturn(tester, 'My profile', 'Profile');
-    await openAndReturn(tester, 'Topics you follow', 'Mix');
 
-    // Mirra+ opens the paywall (which auto-closes if already premium).
-    await tester.tap(find.text('Mirra+').first);
-    await settle(tester);
-    if (find.text('Your streak').evaluate().isEmpty) await goBack(tester);
-    expect(find.text('Your streak'), findsOneWidget, reason: 'back on hub');
+    // "Customize the app" cards each open their screen.
+    await openAndReturn(tester, 'Topics you follow', 'Bundles');
+    await openAndReturn(tester, 'App icon', 'icon');
 
     // Themes opens the catalog.
     await tester.tap(find.text('Themes').first);
@@ -119,8 +126,9 @@ void main() {
     expect(find.text('Preferences'), findsWidgets);
 
     // ── Preferences rows ───────────────────────────────────────────────
-    await openAndReturn(tester, 'Manage subscription', 'subscription');
-    await openAndReturn(tester, 'Content preferences', 'answers shape');
+    // Non-premium: the subscription row opens the upgrade pitch (free trial).
+    await openAndReturn(tester, 'Manage subscription', 'free trial');
+    await openAndReturn(tester, 'Content preferences', 'categories');
     await openAndReturn(tester, 'Gender identity', 'personalize');
     await openAndReturn(tester, 'Language', 'English');
     await openAndReturn(tester, 'Sound', 'THEME SOUND');
@@ -148,7 +156,12 @@ void main() {
     expect(find.textContaining('haven’t muted'), findsOneWidget);
     await goBack(tester);
 
-    // App theme row opens the catalog.
+    // App theme row (near the bottom of the list) opens the catalog.
+    await tester.scrollUntilVisible(
+      find.text('App theme'),
+      250,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.tap(find.text('App theme'));
     await settle(tester);
     expect(find.text('For you'), findsWidgets);

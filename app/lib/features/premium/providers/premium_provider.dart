@@ -6,24 +6,24 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 
 import '../../../core/storage/hive_boxes.dart';
 
-/// The three Mirra+ plans. Product ids must match App Store Connect.
+/// The Mirra+ plans (monthly + annual). Product ids must match App Store
+/// Connect.
 enum MirraPlan {
-  weekly('mirra_plus_weekly', 'Weekly', '4,99 €', '7,99 €', '-38%', 'per week'),
   monthly(
     'mirra_plus_monthly',
     'Monthly',
-    '10,99 €',
-    '20,99 €',
+    '11,99 €',
+    '22,99 €',
     '-48%',
     'per month',
   ),
   annual(
     'mirra_plus_annual',
     'Annual',
-    '44,99 €',
-    '99,99 €',
-    '-55%',
-    'per year — 3,75 €/mo',
+    '39,49 €',
+    '89,99 €',
+    '-56%',
+    'per year — 3,30 €/mo',
   );
 
   const MirraPlan(

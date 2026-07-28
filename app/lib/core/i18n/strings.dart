@@ -172,6 +172,104 @@ const Map<String, String> _fr = {
   'You’ve seen it all for now': 'Vous avez tout vu pour aujourd’hui',
   'Come back tomorrow — or go unlimited with Mirra+.':
       'Revenez demain — ou passez en illimité avec Mirra+.',
+
+  // App icon picker (onboarding)
+  'Which icon style\ndo you like the most?':
+      'Quel style d’icône\npréférez-vous ?',
+
+  // Profile
+  'Your journey': 'Votre parcours',
+  'Day streak': 'Jours de série',
+  'Your answers': 'Vos réponses',
+  'Mirra+ member': 'Membre Mirra+',
+  'Get Mirra+ — go unlimited': 'Passez à Mirra+ — en illimité',
+  'Signed in': 'Connecté',
+  'Sign out': 'Se déconnecter',
+  'Your account': 'Votre compte',
+  'Save your themes': 'Enregistrez vos thèmes',
+  'Sign in to keep your custom themes tied to your account — '
+          'on every device, even after reinstalling.':
+      'Connectez-vous pour garder vos thèmes personnalisés liés à votre '
+          'compte — sur tous vos appareils, même après réinstallation.',
+  'Continue with Apple': 'Continuer avec Apple',
+  'Continue with Google': 'Continuer avec Google',
+  'One moment…': 'Un instant…',
+
+  // Paywall
+  'Become the best\nversion of you': 'Deviens la meilleure\nversion de toi',
+  'Loved by 100,000+ people rewiring their mindset':
+      'Adoré par plus de 100 000 personnes qui transforment leur état d’esprit',
+  'Unlimited daily affirmations': 'Affirmations illimitées chaque jour',
+  'All categories — and your own': 'Toutes les catégories — et les tiennes',
+  'Widgets, sounds & voices': 'Widgets, sons et voix',
+  'No ads, ever': 'Zéro publicité, jamais',
+  'Start my 3-day free trial': 'Démarrer mon essai gratuit de 3 jours',
+  '3-day free trial included': 'Essai gratuit de 3 jours inclus',
+  'Remind me before my trial ends':
+      'Me rappeler avant la fin de l’essai',
+  '3 days free, then ': '3 jours gratuits, puis ',
+  '/year. Cancel anytime — no commitment.':
+      '/an. Annulable à tout moment — sans engagement.',
+  'Cancel anytime — no commitment.':
+      'Annulable à tout moment — sans engagement.',
+  'Restore': 'Restaurer',
+  'Terms': 'Conditions',
+  'Privacy': 'Confidentialité',
+  'per week': 'par semaine',
+  'per month': 'par mois',
+  'per year — 3,30 €/mo': 'par an — 3,30 €/mois',
+
+  // Paywall — free-trial timeline
+  'How your free\ntrial works': 'Comment fonctionne\nvotre essai gratuit',
+  "You won't be charged anything today":
+      'Vous ne serez pas débité aujourd’hui',
+  'Today': 'Aujourd’hui',
+  'Get full access and see your mindset start to change.':
+      'Accès complet — votre état d’esprit commence déjà à changer.',
+  'Day 2': 'Jour 2',
+  'Get a reminder that your trial ends in 24 hours.':
+      'Un rappel : votre essai se termine dans 24 h.',
+  'After day 3': 'Après le jour 3',
+  'Your free trial ends. Cancel anytime before — no charge.':
+      'Votre essai gratuit se termine. Annulez avant — sans frais.',
+  'Reminder before trial ends': 'Rappel avant la fin de l’essai',
+  'How does the\nfree trial work?': 'Comment fonctionne\nl’essai gratuit ?',
+  'Install the app': 'Installez l’appli',
+  'Set it up for your goals': 'Paramétrez-la pour vos objectifs',
+  'Trial starts': 'Début de l’essai',
+  'Completely free for your first 3 days':
+      'Entièrement gratuit pendant vos 3 premiers jours',
+  'When your trial is about to end': 'Lorsque votre essai prendra fin',
+  'Become a member': 'Devenir membre',
+  'Your trial ends unless you cancel':
+      'Votre essai prendra fin sauf si vous l’annulez',
+  'Try for €0.00': 'Essayez pour 0,00 €',
+  'Day 3': 'Jour 3',
+  'Full access': 'Accès complet',
+  'Reminder': 'Rappel',
+  'Trial ends': 'Fin de l’essai',
+  'Unlimited free access for 3 days, then ':
+      'Accès illimité gratuit pendant 3 jours, puis ',
+  '/month': '/mois',
+  'Terms & Conditions': 'Conditions générales',
+  'Privacy Policy': 'Politique de confidentialité',
+
+  // Free-plan limits
+  'Free plan: up to 2 categories.':
+      'Plan gratuit : 2 catégories maximum.',
+  'Unlock all categories': 'Débloque toutes les catégories',
+  'The free plan lets you pick 2 categories.\nGo unlimited with Mirra+.':
+      'Le plan gratuit permet 2 catégories.\nPasse en illimité avec Mirra+.',
+  'Your favorites are full': 'Tes favoris sont pleins',
+  'The free plan keeps your 2 favorites.\nGo unlimited with Mirra+.':
+      'Le plan gratuit garde 2 favoris.\nPasse en illimité avec Mirra+.',
+  'Use the free app': 'Utiliser l’app gratuite',
+  '/month, auto-renews. Cancel anytime.':
+      '/mois, renouvellement automatique. Annulable à tout moment.',
+  '/year, auto-renews. Cancel anytime.':
+      '/an, renouvellement automatique. Annulable à tout moment.',
+  'Auto-renews. Cancel anytime.':
+      'Renouvellement automatique. Annulable à tout moment.',
 };
 
 /// Translate an English source string for the given language code.

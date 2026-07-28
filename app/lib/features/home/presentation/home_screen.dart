@@ -87,7 +87,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         .read(favoritesProvider.notifier)
                         .toggle(q.id);
                     if (!added && context.mounted) {
-                      await showUpsellSheet(context);
+                      await showUpsellSheet(
+                        context,
+                        title: ref.tr('Your favorites are full'),
+                        subtitle: ref.tr(
+                          'The free plan keeps your 2 favorites.\n'
+                          'Go unlimited with Mirra+.',
+                        ),
+                      );
                     }
                     return added;
                   },
@@ -346,6 +353,9 @@ class _QuoteCardState extends ConsumerState<_QuoteCard>
 
   /// Records an engagement (earns flames + teaches the model what resonated).
   void _engage(String action) {
+    // Instant, offline flame growth on the badge.
+    ref.read(localFlamesProvider.notifier).bump(action);
+    // Server-backed engagement level (best-effort, signed-in only).
     ref.read(flameProvider.notifier).record(
           action,
           text: quote.text,
@@ -694,7 +704,7 @@ class _TopBar extends ConsumerWidget {
                       Text(
                         ref.watch(isPremiumProvider)
                             ? '${favs.length}'
-                            : '${favs.length}/5',
+                            : '${favs.length}/${FavoritesNotifier.freeLimit}',
                         style: MirraType.cochin(
                           size: 12,
                           weight: FontWeight.w700,
@@ -723,57 +733,88 @@ class _StreakBadge extends ConsumerStatefulWidget {
 }
 
 class _StreakBadgeState extends ConsumerState<_StreakBadge>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 900),
   )..repeat(reverse: true);
 
+  // One-shot "pop" played each time the flame count goes up.
+  late final AnimationController _pop = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 420),
+  );
+
   @override
   void dispose() {
     _controller.dispose();
+    _pop.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final streak = ref.watch(streakProvider).count;
-    // Once the user has flame points (signed in + engaging), the badge shows
-    // those; otherwise it falls back to the day streak.
+    // Interactive flames grow instantly on every like/share/copy (offline).
+    // Fall back to the server engagement level, then the day streak.
+    final localFlamesState = ref.watch(localFlamesProvider);
+    final localFlames = localFlamesState.count;
     final flames = ref.watch(flameProvider).points;
-    final display = flames > 0 ? flames : streak;
+    final display = localFlames > 0
+        ? localFlames
+        : (flames > 0 ? flames : streak);
     final theme = ref.watch(appThemeProvider);
     final fg = theme.dark ? Colors.white : MirraColors.ink;
+
+    // When a bump lands, play the pop once and clear the flag.
+    ref.listen<LocalFlamesState>(localFlamesProvider, (prev, next) {
+      if (next.lastDelta > 0) {
+        _pop.forward(from: 0);
+        Future.microtask(
+          () => ref.read(localFlamesProvider.notifier).clearDelta(),
+        );
+      }
+    });
 
     return GestureDetector(
       onTap: () => context.push('/streak'),
       behavior: HitTestBehavior.opaque,
-      child: Glass(
-        radius: MirraRadius.pill,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        child: Row(
-          children: [
-            AnimatedBuilder(
-              animation: _controller,
-              builder: (context, child) {
-                final t = Curves.easeInOut.transform(_controller.value);
-                return Transform.rotate(
-                  angle: (t - 0.5) * 0.22,
-                  child: Transform.scale(scale: 0.92 + 0.18 * t, child: child),
-                );
-              },
-              child: const Text('🔥', style: TextStyle(fontSize: 15)),
-            ),
-            const SizedBox(width: 5),
-            Text(
-              '$display',
-              style: MirraType.cochin(
-                size: 13,
-                weight: FontWeight.w700,
-                color: fg,
+      child: AnimatedBuilder(
+        animation: _pop,
+        builder: (context, child) {
+          // A quick swell that settles back to normal size.
+          final p = Curves.easeOut.transform(_pop.value);
+          final swell = 1 + 0.28 * (p < 0.5 ? p * 2 : (1 - p) * 2);
+          return Transform.scale(scale: swell, child: child);
+        },
+        child: Glass(
+          radius: MirraRadius.pill,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Row(
+            children: [
+              AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  final t = Curves.easeInOut.transform(_controller.value);
+                  return Transform.rotate(
+                    angle: (t - 0.5) * 0.22,
+                    child:
+                        Transform.scale(scale: 0.92 + 0.18 * t, child: child),
+                  );
+                },
+                child: const Text('🔥', style: TextStyle(fontSize: 15)),
               ),
-            ),
-          ],
+              const SizedBox(width: 5),
+              Text(
+                '$display',
+                style: MirraType.cochin(
+                  size: 13,
+                  weight: FontWeight.w700,
+                  color: fg,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

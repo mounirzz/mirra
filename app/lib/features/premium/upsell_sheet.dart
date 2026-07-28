@@ -13,7 +13,7 @@ Future<void> showUpsellSheet(
   BuildContext context, {
   String title = 'Your favorites are full',
   String subtitle =
-      'The free plan keeps your 5 dearest quotes.\nGo unlimited with Mirra+.',
+      'The free plan keeps your 2 favorites.\nGo unlimited with Mirra+.',
 }) {
   return showModalBottomSheet<void>(
     context: context,

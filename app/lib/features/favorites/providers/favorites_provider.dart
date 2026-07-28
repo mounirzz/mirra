@@ -6,7 +6,7 @@ class FavoritesNotifier extends StateNotifier<Set<String>> {
   FavoritesNotifier() : super(MirraBoxes.favorites.values.toSet());
 
   /// Free-plan cap; going past it is the Mirra+ upsell moment.
-  static const freeLimit = 5;
+  static const freeLimit = 2;
 
   bool isFavorite(String quoteId) => state.contains(quoteId);
 

@@ -4,9 +4,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/colors.dart';
 import '../../../core/theme/typography.dart';
+import '../../onboarding/providers/app_icon_provider.dart';
 
 /// App-icon picker — actually swaps the iOS Home-screen icon via alternate app
-/// icons (name = null → the default Mirra icon).
+/// icons (name = null → the default Mirra icon). Uses the same real Mirra
+/// logos as onboarding (declared as AppIconAlt1..N in Info.plist).
 class AppIconScreen extends StatefulWidget {
   const AppIconScreen({super.key});
 
@@ -15,13 +17,17 @@ class AppIconScreen extends StatefulWidget {
 }
 
 class _AppIconScreenState extends State<AppIconScreen> {
-  // (label, alternate icon name or null for default, gradient preview)
-  static const _icons = <(String, String?, List<Color>)>[
-    ('Default', null, [Color(0xFFB79DE8), Color(0xFFE86A5E)]),
-    ('Sunset', 'MirraSunset', [Color(0xFFF7B267), Color(0xFFEA5455)]),
-    ('Ocean', 'MirraOcean', [Color(0xFF5AA9E6), Color(0xFF6C5CE7)]),
-    ('Forest', 'MirraForest', [Color(0xFF43C59E), Color(0xFF157A6E)]),
-    ('Ink', 'MirraInk', [Color(0xFF2A2F40), Color(0xFF1A1A1A)]),
+  // (label, alternate icon name or null for default, asset preview or null).
+  // The default app icon is mirra_1, so its preview uses that same asset.
+  static final _icons = <(String, String?, String?)>[
+    (
+      'Default',
+      null,
+      kAppIconAssets.isNotEmpty ? kAppIconAssets.first : null,
+    ),
+    // Skip Alt1 (identical to Default = mirra_1); offer the other logos.
+    for (var i = 1; i < kAppIconAssets.length; i++)
+      ('Mirra ${i + 1}', 'AppIconAlt${i + 1}', kAppIconAssets[i]),
   ];
 
   String? _current; // active alternate icon name (null = default)
@@ -45,9 +51,12 @@ class _AppIconScreenState extends State<AppIconScreen> {
 
   Future<void> _select(String? name) async {
     if (name == _current) return;
+    // Optimistic: update the checkmark immediately. We use the public API
+    // (not the private "silent" path, which never invokes its callback and
+    // would hang this await). iOS shows its standard confirmation alert.
+    setState(() => _current = name);
     try {
-      await FlutterDynamicIconPlus.setAlternateIconName(iconName: name, isSilent: true);
-      if (mounted) setState(() => _current = name);
+      await FlutterDynamicIconPlus.setAlternateIconName(iconName: name);
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context)
@@ -98,7 +107,7 @@ class _AppIconScreenState extends State<AppIconScreen> {
                 ),
                 itemCount: _icons.length,
                 itemBuilder: (_, i) {
-                  final (name, iconName, colors) = _icons[i];
+                  final (name, iconName, asset) = _icons[i];
                   final selected = iconName == _current;
                   return GestureDetector(
                     onTap: _supported ? () => _select(iconName) : null,
@@ -116,20 +125,42 @@ class _AppIconScreenState extends State<AppIconScreen> {
                           padding: const EdgeInsets.all(3),
                           child: AspectRatio(
                             aspectRatio: 1,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: colors,
-                                ),
-                                borderRadius: BorderRadius.circular(17),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                'm',
-                                style: MirraType.carmenSans(size: 40, color: Colors.white),
-                              ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(17),
+                              child: asset == null
+                                  ? Container(
+                                      decoration: const BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            Color(0xFFB79DE8),
+                                            Color(0xFFE86A5E),
+                                          ],
+                                        ),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        'm',
+                                        style: MirraType.carmenSans(
+                                            size: 40, color: Colors.white),
+                                      ),
+                                    )
+                                  : Image.asset(
+                                      asset,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, _, _) => Container(
+                                        color: const Color(0xFFF4F2F8),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          name,
+                                          style: MirraType.cochin(
+                                            size: 12,
+                                            color: MirraColors.muted2,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                             ),
                           ),
                         ),

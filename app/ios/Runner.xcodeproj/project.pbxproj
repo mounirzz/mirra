@@ -7,21 +7,39 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		067C5570A6ACE3A4E353BD80 /* AppIconAlt4@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 53EBC7D044ACE74DC333DEF9 /* AppIconAlt4@2x.png */; };
+		08DBB8CDB98662732D2D89DB /* AppIconAlt3@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC9794D2AE14D731AF8ADE36 /* AppIconAlt3@3x.png */; };
+		0E113A484855D8A8A6D0CFEB /* AppIconAlt7@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0CB419C6284100F317C54B0C /* AppIconAlt7@3x.png */; };
+		0E3115CE144B8531D7788AD8 /* AppIconAlt8@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4418B738B16A6F0D570899BA /* AppIconAlt8@3x.png */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		1C46648234967DA29FF12532 /* AppIconAlt7@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = AC9628FFE2DF309AEB9299B1 /* AppIconAlt7@2x.png */; };
+		261B13274F2931C06FEBB42A /* AppIconAlt9@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EE45609B776A336D1231B17B /* AppIconAlt9@2x.png */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
+		3832CBA7776942961A0B2AF0 /* AppIconAlt5@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6A04E1EEA56A2E215A149E54 /* AppIconAlt5@3x.png */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
+		5EDB3FDEE462A98AEBDC3DAF /* AppIconAlt6@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DEA395933C1E6F0E5F877DA9 /* AppIconAlt6@2x.png */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
-		7A11AF0100000000000000F2 /* MotivateIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A11AF0100000000000000F1 /* MotivateIntent.swift */; };
 		77F9585E300CFB0000B8A5AB /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77F9583E300CFAE000B8A5AB /* WidgetKit.framework */; };
 		77F9585F300CFB0000B8A5AB /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77F95840300CFAE000B8A5AB /* SwiftUI.framework */; };
 		77F95870300CFB0100B8A5AB /* MirraWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 77F9585D300CFB0000B8A5AB /* MirraWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
+		798D3853D683ADDCE10565B9 /* AppIconAlt5@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B49B1B667B4FA69E78F82C6C /* AppIconAlt5@2x.png */; };
+		79E5337273EFD4F8C345B6AA /* AppIconAlt8@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A2A6A3F1B620D80B09523B2 /* AppIconAlt8@2x.png */; };
+		7A11AF0100000000000000F2 /* MotivateIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A11AF0100000000000000F1 /* MotivateIntent.swift */; };
+		8F7632F9A056E13079045A7B /* AppIconAlt2@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A07A37FF01B2736C9E47BE9E /* AppIconAlt2@2x.png */; };
+		8FC24A649B5FC9A3971418F5 /* AppIconAlt1@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = B30191CB55F0B8BE9AC5E697 /* AppIconAlt1@3x.png */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		B20030EDF131960E18A510B0 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D059535EF5EAC29C3F4AA075 /* Pods_Runner.framework */; };
+		B314E7ABA4FB959A636E129E /* AppIconAlt1@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 000E00D063A89B87BE2DA884 /* AppIconAlt1@2x.png */; };
+		B90D1153B4BE05E5CD1F6B3B /* AppIconAlt3@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ADDBDD148E28CAA4EA19C066 /* AppIconAlt3@2x.png */; };
 		D1EA811D514997336595EB38 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C482FEE9E714E0ECCF3C39C /* Pods_RunnerTests.framework */; };
+		D35A467DE8A747012884998D /* AppIconAlt9@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A10172AACC1ABEDD0C40DB8 /* AppIconAlt9@3x.png */; };
+		F1CE55A0EB0FB17B7387D6D8 /* AppIconAlt2@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = F93CD0516242E3836382923A /* AppIconAlt2@3x.png */; };
+		F8E968A0CD01F51017DDDB8D /* AppIconAlt6@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2392C92671073EBED76D9C1D /* AppIconAlt6@3x.png */; };
+		FC117B1350D901000856769D /* AppIconAlt4@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 92CF139D0E5A2F238E637BB1 /* AppIconAlt4@3x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,25 +84,34 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		000E00D063A89B87BE2DA884 /* AppIconAlt1@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "AppIconAlt1@2x.png"; sourceTree = "<group>"; };
+		0CB419C6284100F317C54B0C /* AppIconAlt7@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "AppIconAlt7@3x.png"; sourceTree = "<group>"; };
 		0E129065CEA12EDF30E02B82 /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
+		2392C92671073EBED76D9C1D /* AppIconAlt6@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "AppIconAlt6@3x.png"; sourceTree = "<group>"; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		3C482FEE9E714E0ECCF3C39C /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4418B738B16A6F0D570899BA /* AppIconAlt8@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "AppIconAlt8@3x.png"; sourceTree = "<group>"; };
 		49D773A20370E650EAAD5D84 /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
+		53EBC7D044ACE74DC333DEF9 /* AppIconAlt4@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "AppIconAlt4@2x.png"; sourceTree = "<group>"; };
 		65BD09013E039381DE282EA1 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
+		6A04E1EEA56A2E215A149E54 /* AppIconAlt5@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "AppIconAlt5@3x.png"; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		7A11AF0100000000000000F1 /* MotivateIntent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MotivateIntent.swift; sourceTree = "<group>"; };
 		77F9583E300CFAE000B8A5AB /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		77F95840300CFAE000B8A5AB /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		77F9585D300CFB0000B8A5AB /* MirraWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MirraWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		77F95876300CFB2300B8A5AB /* MirraWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MirraWidgetExtension.entitlements; sourceTree = "<group>"; };
 		7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		78E0A7A72DC9AD7400C4905E /* FlutterGeneratedPluginSwiftPackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterGeneratedPluginSwiftPackage; path = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage; sourceTree = "<group>"; };
+		7A11AF0100000000000000F1 /* MotivateIntent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MotivateIntent.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
+		8A10172AACC1ABEDD0C40DB8 /* AppIconAlt9@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "AppIconAlt9@3x.png"; sourceTree = "<group>"; };
+		8A2A6A3F1B620D80B09523B2 /* AppIconAlt8@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "AppIconAlt8@2x.png"; sourceTree = "<group>"; };
+		92CF139D0E5A2F238E637BB1 /* AppIconAlt4@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "AppIconAlt4@3x.png"; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
 		97C146EE1CF9000F007C117D /* Runner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Runner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -92,10 +119,19 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A07A37FF01B2736C9E47BE9E /* AppIconAlt2@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "AppIconAlt2@2x.png"; sourceTree = "<group>"; };
 		A770F6166D96057D9F1A5B88 /* Pods-RunnerTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile.xcconfig"; sourceTree = "<group>"; };
+		AC9628FFE2DF309AEB9299B1 /* AppIconAlt7@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "AppIconAlt7@2x.png"; sourceTree = "<group>"; };
+		ADDBDD148E28CAA4EA19C066 /* AppIconAlt3@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "AppIconAlt3@2x.png"; sourceTree = "<group>"; };
 		B2CA22D0ECF5ED0607B38303 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
+		B30191CB55F0B8BE9AC5E697 /* AppIconAlt1@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "AppIconAlt1@3x.png"; sourceTree = "<group>"; };
+		B49B1B667B4FA69E78F82C6C /* AppIconAlt5@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "AppIconAlt5@2x.png"; sourceTree = "<group>"; };
 		B5DE9FED94073A8787056F1E /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
+		CC9794D2AE14D731AF8ADE36 /* AppIconAlt3@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "AppIconAlt3@3x.png"; sourceTree = "<group>"; };
 		D059535EF5EAC29C3F4AA075 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DEA395933C1E6F0E5F877DA9 /* AppIconAlt6@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "AppIconAlt6@2x.png"; sourceTree = "<group>"; };
+		EE45609B776A336D1231B17B /* AppIconAlt9@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "AppIconAlt9@2x.png"; sourceTree = "<group>"; };
+		F93CD0516242E3836382923A /* AppIconAlt2@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "AppIconAlt2@3x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -222,6 +258,7 @@
 				7A11AF0100000000000000F1 /* MotivateIntent.swift */,
 				7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
+				EE0E3024A931E13BC1C5F4D7 /* AltAppIcons */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -248,6 +285,32 @@
 				A770F6166D96057D9F1A5B88 /* Pods-RunnerTests.profile.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		EE0E3024A931E13BC1C5F4D7 /* AltAppIcons */ = {
+			isa = PBXGroup;
+			children = (
+				000E00D063A89B87BE2DA884 /* AppIconAlt1@2x.png */,
+				B30191CB55F0B8BE9AC5E697 /* AppIconAlt1@3x.png */,
+				A07A37FF01B2736C9E47BE9E /* AppIconAlt2@2x.png */,
+				F93CD0516242E3836382923A /* AppIconAlt2@3x.png */,
+				ADDBDD148E28CAA4EA19C066 /* AppIconAlt3@2x.png */,
+				CC9794D2AE14D731AF8ADE36 /* AppIconAlt3@3x.png */,
+				53EBC7D044ACE74DC333DEF9 /* AppIconAlt4@2x.png */,
+				92CF139D0E5A2F238E637BB1 /* AppIconAlt4@3x.png */,
+				B49B1B667B4FA69E78F82C6C /* AppIconAlt5@2x.png */,
+				6A04E1EEA56A2E215A149E54 /* AppIconAlt5@3x.png */,
+				DEA395933C1E6F0E5F877DA9 /* AppIconAlt6@2x.png */,
+				2392C92671073EBED76D9C1D /* AppIconAlt6@3x.png */,
+				AC9628FFE2DF309AEB9299B1 /* AppIconAlt7@2x.png */,
+				0CB419C6284100F317C54B0C /* AppIconAlt7@3x.png */,
+				8A2A6A3F1B620D80B09523B2 /* AppIconAlt8@2x.png */,
+				4418B738B16A6F0D570899BA /* AppIconAlt8@3x.png */,
+				EE45609B776A336D1231B17B /* AppIconAlt9@2x.png */,
+				8A10172AACC1ABEDD0C40DB8 /* AppIconAlt9@3x.png */,
+			);
+			name = AltAppIcons;
+			path = AltAppIcons;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -389,6 +452,24 @@
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
+				B314E7ABA4FB959A636E129E /* AppIconAlt1@2x.png in Resources */,
+				8FC24A649B5FC9A3971418F5 /* AppIconAlt1@3x.png in Resources */,
+				8F7632F9A056E13079045A7B /* AppIconAlt2@2x.png in Resources */,
+				F1CE55A0EB0FB17B7387D6D8 /* AppIconAlt2@3x.png in Resources */,
+				B90D1153B4BE05E5CD1F6B3B /* AppIconAlt3@2x.png in Resources */,
+				08DBB8CDB98662732D2D89DB /* AppIconAlt3@3x.png in Resources */,
+				067C5570A6ACE3A4E353BD80 /* AppIconAlt4@2x.png in Resources */,
+				FC117B1350D901000856769D /* AppIconAlt4@3x.png in Resources */,
+				798D3853D683ADDCE10565B9 /* AppIconAlt5@2x.png in Resources */,
+				3832CBA7776942961A0B2AF0 /* AppIconAlt5@3x.png in Resources */,
+				5EDB3FDEE462A98AEBDC3DAF /* AppIconAlt6@2x.png in Resources */,
+				F8E968A0CD01F51017DDDB8D /* AppIconAlt6@3x.png in Resources */,
+				1C46648234967DA29FF12532 /* AppIconAlt7@2x.png in Resources */,
+				0E113A484855D8A8A6D0CFEB /* AppIconAlt7@3x.png in Resources */,
+				79E5337273EFD4F8C345B6AA /* AppIconAlt8@2x.png in Resources */,
+				0E3115CE144B8531D7788AD8 /* AppIconAlt8@3x.png in Resources */,
+				261B13274F2931C06FEBB42A /* AppIconAlt9@2x.png in Resources */,
+				D35A467DE8A747012884998D /* AppIconAlt9@3x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -607,8 +688,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "MirraSunset MirraOcean MirraForest MirraInk";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = 43UT5U98KJ;
 				ENABLE_BITCODE = NO;
@@ -617,9 +701,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "MirraSunset MirraOcean MirraForest MirraInk";
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mirra.affirmations;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -922,8 +1003,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9740EEB21CF90195004384FC /* Debug.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "MirraSunset MirraOcean MirraForest MirraInk";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = 43UT5U98KJ;
 				ENABLE_BITCODE = NO;
@@ -932,9 +1016,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "MirraSunset MirraOcean MirraForest MirraInk";
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mirra.affirmations;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -948,8 +1029,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "MirraSunset MirraOcean MirraForest MirraInk";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = 43UT5U98KJ;
 				ENABLE_BITCODE = NO;
@@ -958,9 +1042,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "MirraSunset MirraOcean MirraForest MirraInk";
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mirra.affirmations;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";

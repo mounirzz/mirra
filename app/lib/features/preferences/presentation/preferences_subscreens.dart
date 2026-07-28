@@ -10,10 +10,10 @@ import '../../../core/theme/colors.dart';
 import '../../../core/theme/typography.dart';
 import '../../../shared/models/quote.dart';
 import '../../../shared/widgets/chip_option.dart';
+import '../../mix/presentation/category_picker.dart';
 import '../../onboarding/presentation/onboarding_questions.dart';
 import '../../onboarding/providers/onboarding_provider.dart';
 import '../../premium/providers/premium_provider.dart';
-import '../providers/content_topics_provider.dart';
 import '../providers/notifications_provider.dart';
 import '../providers/settings_providers.dart';
 import 'settings_widgets.dart';
@@ -439,69 +439,10 @@ class ContentPrefsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selected = ref.watch(contentTopicsProvider);
-
-    return SettingsSubScreen(
+    // Same interface and backend selection as the Mix screen.
+    return CategoryPickerView(
       title: ref.tr('Content preferences'),
-      subtitle: ref.tr('Select all topics that interest you.'),
-      child: GridView.count(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
-        crossAxisCount: 2,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 2.5,
-        children: [
-          for (final (id, label) in kContentTopics)
-            _TopicChip(
-              label: ref.tr(label),
-              selected: selected.contains(id),
-              onTap: () => ref.read(contentTopicsProvider.notifier).toggle(id),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TopicChip extends StatelessWidget {
-  const _TopicChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 140),
-        curve: Curves.easeOut,
-        alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        decoration: BoxDecoration(
-          color: selected ? MirraColors.chip : Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: selected ? MirraColors.ink : MirraColors.line,
-            width: selected ? 1.6 : 1.2,
-          ),
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: MirraType.cochin(
-            size: 15,
-            weight: selected ? FontWeight.w800 : FontWeight.w600,
-            color: MirraColors.ink,
-          ),
-        ),
-      ),
+      subtitle: ref.tr('Pick one or more categories to shape your feed.'),
     );
   }
 }
